@@ -35,15 +35,3 @@ var telegram = app.Services.GetService<TelegramBot>();
             break;
         }
     }
-
-
-// catch (Exception e)
-// {
-//     Console.ForegroundColor = ConsoleColor.Red;
-//     Console.Write("Error");
-//     var ErrorMessage = e.ToString();
-//     Console.ResetColor();
-//     Console.WriteLine(ErrorMessage);
-//     Console.WriteLine("\n\n Press any key for close program......");
-//     Console.ReadKey();
-// }

@@ -74,7 +74,7 @@ namespace TelegramBot_PerfectMoney.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.UserModel", b =>
+            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.userModel", b =>
                 {
                     b.Property<long>("id")
                         .ValueGeneratedOnAdd()
@@ -129,7 +129,7 @@ namespace TelegramBot_PerfectMoney.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.UserModel", b =>
+            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.userModel", b =>
                 {
                     b.HasOne("TelegramBot_PerfectMoney.Model.RoleModel", "Roles")
                         .WithMany("Users")

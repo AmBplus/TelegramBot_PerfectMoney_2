@@ -19,6 +19,29 @@ namespace TelegramBot_PerfectMoney.Migrations
                 .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.BankAccountNumber", b =>
+                {
+                    b.Property<long>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ShabaNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BankAccountNumber");
+                });
+
             modelBuilder.Entity("TelegramBot_PerfectMoney.Model.BotSetting", b =>
                 {
                     b.Property<long>("id")
@@ -64,13 +87,13 @@ namespace TelegramBot_PerfectMoney.Migrations
                         new
                         {
                             id = 1L,
-                            CreationDate = new DateTime(2023, 6, 16, 11, 19, 34, 58, DateTimeKind.Local).AddTicks(2375),
+                            CreationDate = new DateTime(2023, 6, 25, 22, 0, 5, 607, DateTimeKind.Local).AddTicks(659),
                             Role = "Admin"
                         },
                         new
                         {
                             id = 2L,
-                            CreationDate = new DateTime(2023, 6, 16, 11, 19, 34, 58, DateTimeKind.Local).AddTicks(2407),
+                            CreationDate = new DateTime(2023, 6, 25, 22, 0, 5, 607, DateTimeKind.Local).AddTicks(675),
                             Role = "Customer"
                         });
                 });
@@ -124,10 +147,21 @@ namespace TelegramBot_PerfectMoney.Migrations
                         {
                             id = 1L,
                             Active = true,
-                            CreationDate = new DateTime(2023, 6, 16, 11, 19, 34, 58, DateTimeKind.Local).AddTicks(3787),
+                            CreationDate = new DateTime(2023, 6, 25, 22, 0, 5, 607, DateTimeKind.Local).AddTicks(2268),
                             PhoneNumber = "+989394059810",
                             RoleId = 1L
                         });
+                });
+
+            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.BankAccountNumber", b =>
+                {
+                    b.HasOne("TelegramBot_PerfectMoney.Model.UserModel", "User")
+                        .WithMany("BankAccountNumbers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TelegramBot_PerfectMoney.Model.UserModel", b =>
@@ -144,6 +178,11 @@ namespace TelegramBot_PerfectMoney.Migrations
             modelBuilder.Entity("TelegramBot_PerfectMoney.Model.RoleModel", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.UserModel", b =>
+                {
+                    b.Navigation("BankAccountNumbers");
                 });
 #pragma warning restore 612, 618
         }

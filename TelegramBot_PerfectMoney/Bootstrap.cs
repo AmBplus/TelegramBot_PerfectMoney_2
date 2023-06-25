@@ -22,8 +22,7 @@ namespace TelegramBot_PerfectMoney
         {
             host.ConfigureServices((hostContext, services) =>
             {
-                services.AddSingleton<TelegramBot>();
-                services.AddScoped<IOperationTelegramBot, OperationTelegramBot>();
+            
                 services.AddDbContext<TelContext>(
                  dbContextOptions => dbContextOptions
                .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
@@ -32,8 +31,9 @@ namespace TelegramBot_PerfectMoney
                .LogTo(Console.WriteLine, LogLevel.Information)
                .EnableSensitiveDataLogging()
                .EnableDetailedErrors());
-
-            // services.AddDbContext<TelContext>(x=>x.UseMySql(connectionString,ServerVersion.AutoDetect(connectionString)));
+                services.AddSingleton<TelegramBot>();
+                services.AddScoped<IOperationTelegramBot, OperationTelegramBot>();
+                // services.AddDbContext<TelContext>(x=>x.UseMySql(connectionString,ServerVersion.AutoDetect(connectionString)));
             });
         }
     }
