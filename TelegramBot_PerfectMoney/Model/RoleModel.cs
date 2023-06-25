@@ -9,7 +9,7 @@ namespace TelegramBot_PerfectMoney.Model
     public class RoleModel:Base
     {
         public string? Role { get; set; }
-        public ICollection<userModel> Users { get; set; }
+        public ICollection<UserModel> Users { get; set; }
 
         public RoleModel()
         {

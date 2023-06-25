@@ -9,9 +9,9 @@ using TelegramBot_PerfectMoney.Model;
 
 namespace TelegramBot_PerfectMoney.DataBase
 {
-    public class UserMapping:IEntityTypeConfiguration<userModel>
+    public class UserMapping:IEntityTypeConfiguration<UserModel>
     {
-        public void Configure(EntityTypeBuilder<userModel> builder)
+        public void Configure(EntityTypeBuilder<UserModel> builder)
         {
             builder.HasKey(x => x.id);
             builder.Property(x => x.FirstName).HasMaxLength(200).IsRequired(false);
@@ -22,10 +22,14 @@ namespace TelegramBot_PerfectMoney.DataBase
             builder.Property(x => x.CreationDate);
             builder.Property(x => x.PhoneNumber).HasMaxLength(200).IsRequired(false);
             builder.Property(x => x.UserNameTelegram).IsRequired(false).HasMaxLength(200);
+            builder.HasMany(u => u.BankAccountNumbers)
+            .WithOne(u=>u.User)
+            .HasForeignKey(b => b.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
             builder.HasOne(x => x.Roles).WithMany(x => x.Users).HasForeignKey(x => x.RoleId);
-            builder.HasData(new List<userModel>()
+            builder.HasData(new List<UserModel>()
             {
-                new userModel() { id = 1,PhoneNumber = "+989394059810",RoleId = 1}
+                new UserModel() { id = 1,PhoneNumber = "+989394059810",RoleId = 1}
             });
         }
     }

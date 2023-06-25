@@ -14,7 +14,7 @@ namespace TelegramBot_PerfectMoney.DataBase
     {
     
 
-        public DbSet<userModel> Users { get; set; }
+        public DbSet<UserModel> Users { get; set; }
         public DbSet<BotSetting> botSettings { get; set; }
         public TelContext(DbContextOptions<TelContext> dbContext) : base(dbContext)
         {

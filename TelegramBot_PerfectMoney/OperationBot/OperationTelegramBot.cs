@@ -72,7 +72,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
                     replyMarkup: mainKeyboardMarkup,
                     cancellationToken: cancellationToken);
             }
-            // var user = new userModel()
+            // var user = new UserModel()
             // {
             //     ChatId = update.Message!.Chat.Id,
             //     CodeId = "1111111",
@@ -578,7 +578,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
                 .Include(x => x.Roles).FirstOrDefaultAsync();
             if (user == null)
             {
-                var NewUser = new userModel()
+                var NewUser = new UserModel()
                 {
                     ChatId = update.Message.Chat.Id.ToString(),
                     CodeId = null,
