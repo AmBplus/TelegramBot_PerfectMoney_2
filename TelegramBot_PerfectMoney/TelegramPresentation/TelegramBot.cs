@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -28,12 +30,16 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
         private IOperationTelegramBot _operation { get; set; }
         private CancellationTokenSource cts { get; }
         private TelContext _context { get; set; }
-        public TelegramBot(IOperationTelegramBot operation, TelContext context)
+        public IServiceProvider ServiceProvider { get; }
+
+        public TelegramBot(IServiceProvider serviceProvider)
         {
-            _operation = operation;
-            _context = context;
+
+            _operation = serviceProvider.GetService<IOperationTelegramBot>();
+            _context = serviceProvider.GetService<TelContext>(); 
             cts = new();
             stepHandler = new();
+            ServiceProvider = serviceProvider;
         }
 
         public async Task Run(string TokenBot)
