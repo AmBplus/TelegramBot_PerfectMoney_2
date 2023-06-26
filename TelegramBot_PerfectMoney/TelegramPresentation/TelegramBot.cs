@@ -63,15 +63,7 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($" @{me.Username}");
             Console.ResetColor();
-            // var users = await _context.Users.Where(x => x.RoleId != 1).Include(x => x.Roles).ToListAsync();
-            // foreach (var item in users)
-            // {
-            //     var convert = Convert.ToInt64(item.ChatId);
-            //    await botClient.SendTextMessageAsync(convert, "بات فعال شد");
-            // }
-
-
-            // Send cancellation request to stop bot
+      
         }
         private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
