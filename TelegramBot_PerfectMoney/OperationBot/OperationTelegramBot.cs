@@ -132,7 +132,7 @@ namespace TelegramBot_PerfectMoney.OperationBot
             var ShareContactKeyboard = CreatKeyboard.GetContactKeyboard();
             Message sentMessage = await botClient.SendTextMessageAsync(
                 chatId: update.Message!.Chat.Id,
-                text: "لطفا شماره تلفن خودروا ارسال کنید",
+                text: "لطفا با کلیک بر دکمه ارسال شماره تلفن ، شماره خود را برای ما ارسال نمایید",
                 replyMarkup: ShareContactKeyboard,
                 cancellationToken: cancellationToken);
         }

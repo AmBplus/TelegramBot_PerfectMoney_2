@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TelegramBot_PerfectMoney.DataBase;
 
@@ -10,9 +11,10 @@ using TelegramBot_PerfectMoney.DataBase;
 namespace TelegramBot_PerfectMoney.Migrations
 {
     [DbContext(typeof(TelContext))]
-    partial class TelContextModelSnapshot : ModelSnapshot
+    [Migration("20230625192655_modifedBandCart")]
+    partial class modifedBandCart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
