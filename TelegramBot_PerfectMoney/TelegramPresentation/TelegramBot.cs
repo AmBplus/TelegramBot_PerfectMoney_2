@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -28,10 +29,10 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
         private IOperationTelegramBot _operation { get; set; }
         private CancellationTokenSource cts { get; }
         private TelContext _context { get; set; }
-        public TelegramBot(IOperationTelegramBot operation, TelContext context)
+        public TelegramBot(IServiceProvider provider)
         {
-            _operation = operation;
-            _context = context;
+            _operation = provider.GetService<IOperationTelegramBot>();
+            _context = provider.GetService<TelContext>();
             cts = new();
             stepHandler = new();
         }

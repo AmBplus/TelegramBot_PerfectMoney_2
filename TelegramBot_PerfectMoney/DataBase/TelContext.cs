@@ -16,7 +16,7 @@ namespace TelegramBot_PerfectMoney.DataBase
     public class TelContext:DbContext
     {
 
-        private static string connectionString = "Server=localhost; User ID=root; Password=0903@m!rK; Database=TelBot";
+        private static string connectionString = "Server=localhost; User ID=root; Password=126543210mM$; Database=TelBot";
         public DbSet<UserModel> Users { get; set; }
         public DbSet<BotSetting> botSettings { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
