@@ -5,12 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using TelegramBot_PerfectMoney.DataBase;
 using TelegramBot_PerfectMoney.OperationBot;
+using TelegramBot_PerfectMoney.Settings;
 using TelegramBot_PerfectMoney.TelegramPresentation;
+using TelegramBot_PerfectMoney.UseCase;
 
 namespace TelegramBot_PerfectMoney
 {
@@ -22,7 +25,8 @@ namespace TelegramBot_PerfectMoney
         {
             host.ConfigureServices((hostContext, services) =>
             {
-            
+
+
                 services.AddDbContext<TelContext>(
                  dbContextOptions => dbContextOptions
                .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
@@ -33,7 +37,10 @@ namespace TelegramBot_PerfectMoney
                .EnableDetailedErrors());
                 services.AddSingleton<TelegramBot>();
                 services.AddScoped<IOperationTelegramBot, OperationTelegramBot>();
-                // services.AddDbContext<TelContext>(x=>x.UseMySql(connectionString,ServerVersion.AutoDetect(connectionString)));
+                services.Configure<VerifyAccountSettings>(hostContext.Configuration.GetSection("VerifyNumberAndCart"));
+                services.AddTransient<IVerifyUserCard, VerifyUserCard>();
+                
+
             });
         }
     }
