@@ -10,9 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using TelegramBot_PerfectMoney.DataBase;
-using TelegramBot_PerfectMoney.OperationBot;
-using TelegramBot_PerfectMoney.Settings;
 using TelegramBot_PerfectMoney.TelegramPresentation;
+using TelegramBot_PerfectMoney.TelegramPresentation.OperationBot;
 using TelegramBot_PerfectMoney.UseCase;
 
 namespace TelegramBot_PerfectMoney
@@ -37,7 +36,9 @@ namespace TelegramBot_PerfectMoney
                .EnableDetailedErrors());
                 services.AddSingleton<TelegramBot>();
                 services.AddScoped<IOperationTelegramBot, OperationTelegramBot>();
-                services.Configure<VerifyAccountSettings>(hostContext.Configuration.GetSection("VerifyNumberAndCart"));
+                /*services.Configure<VerifyAccountSettings>(hostContext.Configuration.GetSection("VerifyNumberAndCart"));*/
+
+                services.AddSingleton<IVerifyCardToken, VerifyCardToken>();
                 services.AddTransient<IVerifyUserCard, VerifyUserCard>();
                 
 

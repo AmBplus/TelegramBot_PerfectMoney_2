@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.Logging;
-using Telegram.Bot.Types;
-using TelegramBot_PerfectMoney.Model;
-using TelegramBot_PerfectMoney.TelegramPresentation;
 
-namespace TelegramBot_PerfectMoney.DataBase
+using Microsoft.Extensions.Logging;
+using PefectMoney.Core.Data;
+using PefectMoney.Core.Model;
+using PefectMoney.Data.Mapping;
+
+namespace PefectMoney.Data.DataBase
 {
-    public class TelContext:DbContext
+    public class TelContext:DbContext , ITelContext
     {
 
         private static string connectionString = "Server=localhost; User ID=root; Password=0903@m!rK; Database=TelBot";
         public DbSet<UserModel> Users { get; set; }
         public DbSet<BotSetting> botSettings { get; set; }
+        public DbSet<BankCard> BankCards { get; set; }
+        public DbSet<RoleModel> RoleModels{ get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
          optionsBuilder

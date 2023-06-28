@@ -2,17 +2,19 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TelegramBot_PerfectMoney.DataBase;
+using PefectMoney.Data.DataBase;
 
 #nullable disable
 
-namespace TelegramBot_PerfectMoney.Migrations
+namespace PefectMoney.Data.Migrations
 {
     [DbContext(typeof(TelContext))]
-    partial class TelContextModelSnapshot : ModelSnapshot
+    [Migration("20230625192655_modifedBandCart")]
+    partial class modifedBandCart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,13 +92,13 @@ namespace TelegramBot_PerfectMoney.Migrations
                         new
                         {
                             id = 1L,
-                            CreationDate = new DateTime(2023, 6, 27, 4, 11, 55, 189, DateTimeKind.Local).AddTicks(669),
+                            CreationDate = new DateTime(2023, 6, 25, 22, 56, 55, 460, DateTimeKind.Local).AddTicks(6283),
                             Role = "Admin"
                         },
                         new
                         {
                             id = 2L,
-                            CreationDate = new DateTime(2023, 6, 27, 4, 11, 55, 189, DateTimeKind.Local).AddTicks(682),
+                            CreationDate = new DateTime(2023, 6, 25, 22, 56, 55, 460, DateTimeKind.Local).AddTicks(6305),
                             Role = "Customer"
                         });
                 });
@@ -150,7 +152,7 @@ namespace TelegramBot_PerfectMoney.Migrations
                         {
                             id = 1L,
                             Active = true,
-                            CreationDate = new DateTime(2023, 6, 27, 4, 11, 55, 189, DateTimeKind.Local).AddTicks(2288),
+                            CreationDate = new DateTime(2023, 6, 25, 22, 56, 55, 460, DateTimeKind.Local).AddTicks(9193),
                             PhoneNumber = "+989394059810",
                             RoleId = 1L
                         });

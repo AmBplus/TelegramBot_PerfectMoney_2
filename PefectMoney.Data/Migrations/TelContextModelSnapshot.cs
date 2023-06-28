@@ -3,11 +3,11 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TelegramBot_PerfectMoney.DataBase;
+using PefectMoney.Data.DataBase;
 
 #nullable disable
 
-namespace TelegramBot_PerfectMoney.Migrations
+namespace PefectMoney.Data.Migrations
 {
     [DbContext(typeof(TelContext))]
     partial class TelContextModelSnapshot : ModelSnapshot
@@ -19,7 +19,7 @@ namespace TelegramBot_PerfectMoney.Migrations
                 .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.BankCart", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.BankCard", b =>
                 {
                     b.Property<long>("id")
                         .ValueGeneratedOnAdd()
@@ -42,10 +42,10 @@ namespace TelegramBot_PerfectMoney.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BankCart");
+                    b.ToTable("BankCards");
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.BotSetting", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.BotSetting", b =>
                 {
                     b.Property<long>("id")
                         .ValueGeneratedOnAdd()
@@ -70,7 +70,7 @@ namespace TelegramBot_PerfectMoney.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.RoleModel", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.RoleModel", b =>
                 {
                     b.Property<long>("id")
                         .ValueGeneratedOnAdd()
@@ -84,24 +84,24 @@ namespace TelegramBot_PerfectMoney.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("RoleModel");
+                    b.ToTable("RoleModels");
 
                     b.HasData(
                         new
                         {
                             id = 1L,
-                            CreationDate = new DateTime(2023, 6, 27, 4, 11, 55, 189, DateTimeKind.Local).AddTicks(669),
+                            CreationDate = new DateTime(2023, 6, 28, 0, 26, 55, 550, DateTimeKind.Local).AddTicks(84),
                             Role = "Admin"
                         },
                         new
                         {
                             id = 2L,
-                            CreationDate = new DateTime(2023, 6, 27, 4, 11, 55, 189, DateTimeKind.Local).AddTicks(682),
+                            CreationDate = new DateTime(2023, 6, 28, 0, 26, 55, 550, DateTimeKind.Local).AddTicks(102),
                             Role = "Customer"
                         });
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.UserModel", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.UserModel", b =>
                 {
                     b.Property<long>("id")
                         .ValueGeneratedOnAdd()
@@ -150,15 +150,15 @@ namespace TelegramBot_PerfectMoney.Migrations
                         {
                             id = 1L,
                             Active = true,
-                            CreationDate = new DateTime(2023, 6, 27, 4, 11, 55, 189, DateTimeKind.Local).AddTicks(2288),
+                            CreationDate = new DateTime(2023, 6, 28, 0, 26, 55, 550, DateTimeKind.Local).AddTicks(1744),
                             PhoneNumber = "+989394059810",
                             RoleId = 1L
                         });
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.BankCart", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.BankCard", b =>
                 {
-                    b.HasOne("TelegramBot_PerfectMoney.Model.UserModel", "User")
+                    b.HasOne("PefectMoney.Core.Model.UserModel", "User")
                         .WithMany("BankAccountNumbers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -167,9 +167,9 @@ namespace TelegramBot_PerfectMoney.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.UserModel", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.UserModel", b =>
                 {
-                    b.HasOne("TelegramBot_PerfectMoney.Model.RoleModel", "Roles")
+                    b.HasOne("PefectMoney.Core.Model.RoleModel", "Roles")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -178,12 +178,12 @@ namespace TelegramBot_PerfectMoney.Migrations
                     b.Navigation("Roles");
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.RoleModel", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.RoleModel", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.UserModel", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.UserModel", b =>
                 {
                     b.Navigation("BankAccountNumbers");
                 });

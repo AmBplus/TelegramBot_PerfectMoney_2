@@ -2,57 +2,30 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TelegramBot_PerfectMoney.DataBase;
+using PefectMoney.Data.DataBase;
 
 #nullable disable
 
-namespace TelegramBot_PerfectMoney.Migrations
+namespace PefectMoney.Data.Migrations
 {
     [DbContext(typeof(TelContext))]
-    partial class TelContextModelSnapshot : ModelSnapshot
+    [Migration("20230615142654_initialz")]
+    partial class initialz
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.BankCart", b =>
-                {
-                    b.Property<long>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("CartNumber")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("BankCart");
-                });
-
             modelBuilder.Entity("TelegramBot_PerfectMoney.Model.BotSetting", b =>
                 {
                     b.Property<long>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
-
-                    b.Property<string>("RuleText")
-                        .HasColumnType("longtext");
 
                     b.Property<bool>("StopSelling")
                         .HasColumnType("tinyint(1)");
@@ -65,7 +38,6 @@ namespace TelegramBot_PerfectMoney.Migrations
                         new
                         {
                             id = 1L,
-                            RuleText = "متنی وجود ندارد",
                             StopSelling = false
                         });
                 });
@@ -80,6 +52,7 @@ namespace TelegramBot_PerfectMoney.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Role")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("id");
@@ -90,18 +63,18 @@ namespace TelegramBot_PerfectMoney.Migrations
                         new
                         {
                             id = 1L,
-                            CreationDate = new DateTime(2023, 6, 27, 4, 11, 55, 189, DateTimeKind.Local).AddTicks(669),
+                            CreationDate = new DateTime(2023, 6, 15, 18, 56, 53, 840, DateTimeKind.Local).AddTicks(1982),
                             Role = "Admin"
                         },
                         new
                         {
                             id = 2L,
-                            CreationDate = new DateTime(2023, 6, 27, 4, 11, 55, 189, DateTimeKind.Local).AddTicks(682),
+                            CreationDate = new DateTime(2023, 6, 15, 18, 56, 53, 840, DateTimeKind.Local).AddTicks(2014),
                             Role = "Customer"
                         });
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.UserModel", b =>
+            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.userModel", b =>
                 {
                     b.Property<long>("id")
                         .ValueGeneratedOnAdd()
@@ -150,24 +123,13 @@ namespace TelegramBot_PerfectMoney.Migrations
                         {
                             id = 1L,
                             Active = true,
-                            CreationDate = new DateTime(2023, 6, 27, 4, 11, 55, 189, DateTimeKind.Local).AddTicks(2288),
+                            CreationDate = new DateTime(2023, 6, 15, 18, 56, 53, 840, DateTimeKind.Local).AddTicks(3083),
                             PhoneNumber = "+989394059810",
                             RoleId = 1L
                         });
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.BankCart", b =>
-                {
-                    b.HasOne("TelegramBot_PerfectMoney.Model.UserModel", "User")
-                        .WithMany("BankAccountNumbers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.UserModel", b =>
+            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.userModel", b =>
                 {
                     b.HasOne("TelegramBot_PerfectMoney.Model.RoleModel", "Roles")
                         .WithMany("Users")
@@ -181,11 +143,6 @@ namespace TelegramBot_PerfectMoney.Migrations
             modelBuilder.Entity("TelegramBot_PerfectMoney.Model.RoleModel", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.UserModel", b =>
-                {
-                    b.Navigation("BankAccountNumbers");
                 });
 #pragma warning restore 612, 618
         }

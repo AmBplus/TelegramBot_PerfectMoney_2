@@ -1,65 +1,58 @@
 ﻿
 using RestSharp;
-using RestSharp.Authenticators;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Telegram.Bot.Requests.Abstractions;
-using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
-using TelegramBot_PerfectMoney.Settings;
-using TelegramBot_PerfectMoney.Helper;
+using PefectMoney.Shared.Helper;
+using Microsoft.Extensions.Options;
+using PefectMoney.Core.Settings;
 
-namespace TelegramBot_PerfectMoney.UseCase
+namespace PefectMoney.Core.UseCase.VerifyCard
 {
     public class VerifyCardToken : IVerifyCardToken
     {
-        public VerifyCardToken(IConfiguration configuration)
+        public VerifyCardToken(IOptions<VerifyAccountSettings> configuration)
         {
 
-            VerifyAccountSettings = configuration.GetSection(nameof(VerifyAccountSettings)).Get<VerifyAccountSettings>(); 
+            VerifyAccountSettings = configuration.Value;
             restClient = new RestClient(VerifyAccountSettings.Address);
         }
 
-        private string token ;
+        private string token;
         private string refreshToken;
         private RestClient restClient;
         private RestRequest restRequest;
         private DateTime? DateExpireTokenLifeTime { get; set; }
-        
+
         private VerifyAccountSettings VerifyAccountSettings { get; }
 
-       
+
 
         public async Task<string> GetToken()
         {
-            if(token == null)
-            return  await GenerateTokenSetRefreshToken();
+            if (token == null)
+                return await GenerateTokenSetRefreshToken();
             if (DateExpireTokenLifeTime == null)
             {
                 return await GenerateTokenSetRefreshToken();
             }
 
             //DateTime lastGetToken = new DateTime(LastGetTokenTime.Year, LastGetTokenTime.Month, LastGetTokenTime.Day, LastGetTokenTime.Hour, LastGetTokenTime.Minute, LastGetTokenTime.Second, LastGetTokenTime.Millisecond) ;
-            if(TimeHelper.DateTimeNow < DateExpireTokenLifeTime)
+            if (TimeHelper.DateTimeNow < DateExpireTokenLifeTime)
             {
-                return  await GetTokenWithRefreshToken();
+                return await GetTokenWithRefreshToken();
             }
             return token;
 
         }
 
-        
+
         private async Task<string> GenerateTokenSetRefreshToken()
         {
 
             string authenticationString = GetAuthenticationString();
             restRequest = GenerateVerifyRestRequest(authenticationString);
-            var result =  await restClient.PostAsync<ResponseGetTokenDto>(restRequest);
-            if(result!.Status == FinnotechVerifyCardStatus.DONE.Name )
+            var result = await restClient.PostAsync<ResponseGetTokenDto>(restRequest);
+            if (result!.Status == FinnotechVerifyCardStatus.DONE.Name)
             {
                 token = result.Result.Value;
                 refreshToken = result.Result.RefreshToken;
@@ -68,19 +61,19 @@ namespace TelegramBot_PerfectMoney.UseCase
                 return token;
             }
             throw new Exception(result.Error.Message);
-           
+
         }
         private string GetAuthenticationString()
         {
             string clientId = VerifyAccountSettings.ClientId;
             string clientSecret = VerifyAccountSettings.ClientSecret;
-            
+
             string authString = $"{clientId}:{clientSecret}";
             return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(authString));
         }
         private RestRequest GenerateVerifyRestRequest(string authenticationString)
         {
-            
+
             RestRequest restRequest = new RestRequest("/dev/v2/oauth2/token");
             // Add the headers to the request object
             restRequest.AddHeader("Content-Type", "application/json");
@@ -127,27 +120,27 @@ namespace TelegramBot_PerfectMoney.UseCase
             return await GetTokenWithRefreshToken();
         }
 
-        
+
 
         public async Task<string> GetRefreshToken()
         {
             if (refreshToken == null)
             {
-                if(token == null)
+                if (token == null)
                 {
-                     await GenerateTokenSetRefreshToken();
-                     return refreshToken ?? throw new ArgumentNullException(nameof(refreshToken));
+                    await GenerateTokenSetRefreshToken();
+                    return refreshToken ?? throw new ArgumentNullException(nameof(refreshToken));
                 }
                 throw new Exception("Bussiness Error");
             }
-              
+
             return refreshToken!;
         }
     }
     public class ResponseGetTokenDto
     {
         [JsonPropertyName("result")]
-        
+
         public ResultGetTokenResponseDto Result { get; set; }
         [JsonPropertyName("error")]
         public ErrorGetTokenResponseDto Error { get; set; }
@@ -175,7 +168,7 @@ namespace TelegramBot_PerfectMoney.UseCase
     {
         [JsonPropertyName("code")]
         public string Code { get; set; }
-    
+
         [JsonPropertyName("message")]
         public string Message { get; set; }
 
@@ -183,8 +176,8 @@ namespace TelegramBot_PerfectMoney.UseCase
     public interface IVerifyCardToken
     {
 
-        public  Task<string> GetToken();
-        public  Task<string> GetRefreshToken();
-        public  Task<string> GetNewToken();
+        public Task<string> GetToken();
+        public Task<string> GetRefreshToken();
+        public Task<string> GetNewToken();
     }
 }

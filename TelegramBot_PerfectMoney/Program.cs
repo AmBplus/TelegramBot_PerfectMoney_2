@@ -3,7 +3,6 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot.Exceptions;
 using TelegramBot_PerfectMoney;
-using TelegramBot_PerfectMoney.OperationBot;
 using TelegramBot_PerfectMoney.TelegramPresentation;
 using Microsoft.Extensions.Configuration;
 
@@ -12,8 +11,7 @@ using Microsoft.Extensions.Configuration;
 var builder = Host.CreateDefaultBuilder(args);
 builder.ConfigureAppConfiguration((hostingContext, config) =>
 {
-    config.AddJsonFile("appSettings.json", optional: false, reloadOnChange: false);
-    config.AddJsonFile("verifyAccountSettings.json", optional: false, reloadOnChange: false);
+
 });
 
 

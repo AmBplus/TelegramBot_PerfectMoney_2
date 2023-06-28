@@ -2,17 +2,19 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TelegramBot_PerfectMoney.DataBase;
+using PefectMoney.Data.DataBase;
 
 #nullable disable
 
-namespace TelegramBot_PerfectMoney.Migrations
+namespace PefectMoney.Data.Migrations
 {
     [DbContext(typeof(TelContext))]
-    partial class TelContextModelSnapshot : ModelSnapshot
+    [Migration("20230625192504_addBankCart")]
+    partial class addBankCart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,15 +27,12 @@ namespace TelegramBot_PerfectMoney.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    b.Property<string>("CartNumber")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<string>("ShabaNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -90,13 +89,13 @@ namespace TelegramBot_PerfectMoney.Migrations
                         new
                         {
                             id = 1L,
-                            CreationDate = new DateTime(2023, 6, 27, 4, 11, 55, 189, DateTimeKind.Local).AddTicks(669),
+                            CreationDate = new DateTime(2023, 6, 25, 22, 55, 4, 481, DateTimeKind.Local).AddTicks(1320),
                             Role = "Admin"
                         },
                         new
                         {
                             id = 2L,
-                            CreationDate = new DateTime(2023, 6, 27, 4, 11, 55, 189, DateTimeKind.Local).AddTicks(682),
+                            CreationDate = new DateTime(2023, 6, 25, 22, 55, 4, 481, DateTimeKind.Local).AddTicks(1338),
                             Role = "Customer"
                         });
                 });
@@ -150,7 +149,7 @@ namespace TelegramBot_PerfectMoney.Migrations
                         {
                             id = 1L,
                             Active = true,
-                            CreationDate = new DateTime(2023, 6, 27, 4, 11, 55, 189, DateTimeKind.Local).AddTicks(2288),
+                            CreationDate = new DateTime(2023, 6, 25, 22, 55, 4, 481, DateTimeKind.Local).AddTicks(3399),
                             PhoneNumber = "+989394059810",
                             RoleId = 1L
                         });

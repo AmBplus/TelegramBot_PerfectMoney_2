@@ -18,8 +18,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBot_PerfectMoney.DataBase;
 using TelegramBot_PerfectMoney.Helper;
-using TelegramBot_PerfectMoney.Model;
-using TelegramBot_PerfectMoney.OperationBot;
+using TelegramBot_PerfectMoney.TelegramPresentation.OperationBot;
 
 namespace TelegramBot_PerfectMoney.TelegramPresentation
 {
@@ -90,6 +89,7 @@ namespace TelegramBot_PerfectMoney.TelegramPresentation
                     return;
 
                 }
+               
                 else  if (update.Type == UpdateType.Message && update.Message.Contact is not null)
                 {
                     await _operation.SaveContact(botClient, update, cancellationToken);
