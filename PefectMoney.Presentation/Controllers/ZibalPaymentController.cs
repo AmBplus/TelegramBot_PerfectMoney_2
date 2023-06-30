@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PefectMoney.Core.UseCase.ZibalPayment;
+
 using Telegram.Bot;
 
 namespace PefectMoney.Presentation.Controllers
@@ -28,19 +28,19 @@ namespace PefectMoney.Presentation.Controllers
         public async Task Get(RequestZibalPaymentCallBack request)
         {
             
-            if(request.success == false)
-            {
-                // Code
-            }
-            ZibalVerifyPaymentRequestDto verifyRequest = new ZibalVerifyPaymentRequestDto
-            {
-                TrackId = request.trackId
-            };
-            var result = await Mediator.Send(verifyRequest);
-            if(result.IsSuccess)
-            {
-                // Code
-            }
+            //if(request.success == false)
+            //{
+            //    // Code
+            //}
+            //ZibalVerifyPaymentRequestDto verifyRequest = new ZibalVerifyPaymentRequestDto
+            //{
+            //    TrackId = request.trackId
+            //};
+            //var result = await Mediator.Send(verifyRequest);
+            //if(result.IsSuccess)
+            //{
+            //    // Code
+            //}
             // Code
          }
 

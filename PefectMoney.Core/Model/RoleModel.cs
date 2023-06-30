@@ -7,13 +7,14 @@ using PefectMoney.Core.Model;
 
 namespace PefectMoney.Core.Model
 {
-    public enum RoleName : long
+    public class RoleName 
     {
-        Customer = 2 ,
-        Admin = 1
+        public const int Admin = 1;
+        public const int Customer = 2;
     }
-    public class RoleModel:Base
+    public class RoleModel: Base<int>
     {
+        
         public string? Role { get; set; }
         public ICollection<UserModel> Users { get; set; }
 

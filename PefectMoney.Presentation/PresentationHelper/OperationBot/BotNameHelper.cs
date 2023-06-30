@@ -6,10 +6,12 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
     {
         public const string Menu = "/Menu";
         public const string Start = "/Start";
-        public const string Law = "/Law";
-        public const string Cards = "/Cards";
-        public const string PurchasedVuchers = "/PurchasedVuchers";
-        public const string AdminPanel = "/AdminPanel";
+        public const string Law = "قوانین ⚖";
+        public const string Cards = "کارت ها";
+        public const string PurchasedVuchers = "ووچر های خریداری شده";
+        public const string AdminPanel = "پنل ادمین";
+        public const string AboutUs = "درباره ما";
+        public const string BuyingProduct = "خرید محصول";
       
     }
 }

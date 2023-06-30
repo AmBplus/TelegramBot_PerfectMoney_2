@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PefectMoney.Core.Model
 {
-    public class Product : Base
+    public class Product : Base<long>
     {
 
         public string Name { get; set; }

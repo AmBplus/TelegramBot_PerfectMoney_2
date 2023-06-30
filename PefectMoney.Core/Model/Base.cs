@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace PefectMoney.Core.Model
 {
-    public class Base
+    public abstract class Base<T>
     {
-        public long id { get; set; }
+        public T Id { get; set; }
         public DateTime CreationDate{ get; set; }
     }
 }

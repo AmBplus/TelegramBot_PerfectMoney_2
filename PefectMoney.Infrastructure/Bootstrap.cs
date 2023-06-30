@@ -9,10 +9,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PefectMoney.Core.Data;
+using PefectMoney.Core.Model;
 using PefectMoney.Core.Settings;
-using PefectMoney.Core.UseCase.VerifyCard;
+
 using PefectMoney.Data.DataBase;
-using static System.Formats.Asn1.AsnWriter;
+
 
 namespace PefectMoney.Infrastructure
 {
@@ -30,7 +31,8 @@ namespace PefectMoney.Infrastructure
             services.Configure<VerifyAccountSettings>(
              configuration.GetSection(VerifyAccountSettings.Configuration));
 
-            
+            services.Configure<ZibalPaymentSettings>(
+            configuration.GetSection(ZibalPaymentSettings.Configuration));
 
             services.AddDbContext<ITelContext, TelContext>(
              dbContextOptions => dbContextOptions
@@ -44,8 +46,10 @@ namespace PefectMoney.Infrastructure
             //services.AddScoped<IOperationTelegramBot, OperationTelegramBot>();
             /*services.Configure<VerifyAccountSettings>(hostContext.Configuration.GetSection("VerifyNumberAndCart"));*/
 
-            services.AddSingleton<IVerifyCardToken, VerifyCardToken>();
-            services.AddTransient<IVerifyUserCard, VerifyUserCardHandler>();
+            //services.AddSingleton<IVerifyCardToken, VerifyCardToken>();
+            //services.AddTransient<IVerifyUserCard, VerifyUserCardHandler>();
+
+            services.AddMediatR(cfg=>cfg.RegisterServicesFromAssemblies(typeof(UserModel).Assembly));
 
 
 

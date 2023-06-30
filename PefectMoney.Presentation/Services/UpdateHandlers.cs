@@ -14,6 +14,7 @@ using PefectMoney.Core.Model;
 using MediatR;
 using PefectMoney.Core.UseCase.UserAction;
 using System.Threading;
+using PefectMoney.Core.Settings;
 
 namespace PefectMoney.Presentation.Services;
 
@@ -55,7 +56,11 @@ public class UpdateHandlers
     public async Task HandleUpdateAsync(Telegram.Bot.Types.Update update, CancellationToken cancellationToken)
         {
 
-    
+    if(update.CallbackQuery !=null)
+        {
+            update.Message = update.CallbackQuery.Message;
+            update.Message.Text = update.CallbackQuery.Data;
+        }
   
     var handler = update switch
         {
@@ -73,213 +78,108 @@ public class UpdateHandlers
     private async Task BotOnMessageReceived(Message message, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Receive message type: {MessageType}", message.Type);
-        if (message.Text is not { } messageText)
-            return;
-        var isUserExist = await MediatR.Send(new IsUserExistRequest(message.Chat.Id) );
-        if(!isUserExist)
+   
+        var user = await MediatR.Send(new GetUserByBotUserIdQueryRequest(message.Chat.Id) );
+        if(user == null)
         {
             var result = await CreateUser(message,cancellationToken);
-            if (!result) return;
+            if (result == null) return;
+            user = result;
         }
-   
-
-        //else if (userWithRoles.Roles.Role == RoleName.Admin.ToString())
-        //{
-        //    if (userWithRoles.ChatId == null)
-        //    {
-        //        userWithRoles.ChatId = message.Chat.Id.ToString();
-        //        TelContext.Update(userWithRoles);
-        //        TelContext.SaveChanges();
-        //    }
-        //    var mainKeyboardMarkup = CreatKeyboard.SetMainKeyboardMarkupForAdmin();
-        //    UserStepHandler.DeleteAll(message.Chat.Id.ToString());
-        //     await _botClient.SendTextMessageAsync(
-        //        chatId: message!.Chat.Id,
-        //        text: "به بات خرید پرفکت مانی خوش آمدید.",
-        //        replyMarkup: mainKeyboardMarkup,
-        //        cancellationToken: cancellationToken);
-        //    ;
-        //    return;
-        //}
-        //else
-        //{
-        //    var mainKeyboardMarkup = CreatKeyboard.SetMainKeyboardMarkupForUser();
-        //    UserStepHandler.DeleteAll(message.Chat.Id.ToString());
-        //     await _botClient.SendTextMessageAsync(
-        //        chatId: message!.Chat.Id,
-        //        text: "به بات خرید پرفکت مانی خوش آمدید.",
-        //        replyMarkup: mainKeyboardMarkup,
-        //        cancellationToken: cancellationToken);
-        //}
-
-
-        var action = messageText.Split(' ')[0] switch
+        if (message.Text is not { } messageText)
+            return;
+        if (user.RoleId == RoleName.Admin)
         {
-            "/inline_keyboard" => SendInlineKeyboard(_botClient, message, cancellationToken),
-            "/keyboard" => SendReplyKeyboard(_botClient, message, cancellationToken),
-            "/remove" => RemoveKeyboard(_botClient, message, cancellationToken),
-            "/photo" => SendFile(_botClient, message, cancellationToken),
-            "/request" => RequestContactAndLocation(_botClient, message, cancellationToken),
-            "/inline_mode" => StartInlineQuery(_botClient, message, cancellationToken),
-            "/sendLink" => StartURLbuttons(_botClient, message, cancellationToken),
-            "/SendCard" => StartCard(_botClient, message, cancellationToken),
-            "/SwitchtoInlinebuttons" => StartSwitchtoInlinebuttons(_botClient, message, cancellationToken),
-            _ => Usage(_botClient, message, cancellationToken)
-        };
-        Message sentMessage = await action;
-        _logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
-
-        // Send inline keyboard
-        // You can process responses in BotOnCallbackQueryReceived handler
-        static async Task<Message> SendInlineKeyboard(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
-        {
-            await botClient.SendChatActionAsync(
-                chatId: message.Chat.Id,
-                chatAction: ChatAction.Typing,
-                cancellationToken: cancellationToken);
-
-            // Simulate longer running task
-            await Task.Delay(500, cancellationToken);
-
-            InlineKeyboardMarkup inlineKeyboard = new(
-                new[]
-                {
-                    // first row
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("1.1", "11"),
-                        InlineKeyboardButton.WithCallbackData("1.2", "12"),
-                    },
-                    // second row
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("2.1", "21"),
-                        InlineKeyboardButton.WithCallbackData("2.2", "22"),
-                    },
-                });
-
-            return await botClient.SendTextMessageAsync(
-                chatId: message.Chat.Id,
-                text: "Choose",
-                replyMarkup: inlineKeyboard,
-                cancellationToken: cancellationToken);
+            var action =  AdminPanel(_botClient, message, cancellationToken);
+            Message sentMessage = await action;
+            _logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
         }
-
-        static async Task<Message> SendReplyKeyboard(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+        else // User Panel
         {
-            ReplyKeyboardMarkup replyKeyboardMarkup = new(
-                new[]
-                {
-                        new KeyboardButton[] { "1.1", "1.2" },
-                        new KeyboardButton[] { "2.1", "2.2" },
-                })
+
+            var action = messageText.Split(' ')[0] switch
             {
-                ResizeKeyboard = true
+      
+                BotNameHelper.Law => ShowLaws(_botClient, message, cancellationToken),
+                "/SendCard" => StartCard(_botClient, message, cancellationToken),
+                "/Menu" => UserMenu(_botClient, message, cancellationToken),
+                _ => UserMenu(_botClient, message, cancellationToken)
             };
+            Message sentMessage = await action;
+            _logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
+        }
+
+        static async Task<Message> ShowLaws(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+        {
+            return await botClient.SendTextMessageAsync(
+               chatId: message.Chat.Id,
+               text: "",
+               replyMarkup: CreatKeyboardHelper.GetUserMenueyboard(),
+               cancellationToken: cancellationToken);
+        }
+
+
+        static async Task<Message> UserMenu(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+        {
+
+          
+
+
+
+
+
+            //    return AdminActiveSellingMainMarkup;
+
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: "Choose",
-                replyMarkup: replyKeyboardMarkup,
-                cancellationToken: cancellationToken);
-        }
-
-        static async Task<Message> RemoveKeyboard(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
-        {
-            return await botClient.SendTextMessageAsync(
-                chatId: message.Chat.Id,
-                text: "Removing keyboard",
-                replyMarkup: new ReplyKeyboardRemove(),
-                cancellationToken: cancellationToken);
-        }
-
-        static async Task<Message> SendFile(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
-        {
-            await botClient.SendChatActionAsync(
-                message.Chat.Id,
-                ChatAction.UploadPhoto,
-                cancellationToken: cancellationToken);
-
-            const string filePath = "Files/tux.png";
-            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var fileName = filePath.Split(Path.DirectorySeparatorChar).Last();
-
-            return await botClient.SendPhotoAsync(
-                chatId: message.Chat.Id,
-                photo: new InputFileStream(fileStream, fileName),
-                caption: "Nice Picture",
-                cancellationToken: cancellationToken);
-        }
-
-        static async Task<Message> RequestContactAndLocation(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
-        {
-            ReplyKeyboardMarkup RequestReplyKeyboard = new(
-                new[]
-                {
-                    KeyboardButton.WithRequestLocation("Location"),
-                    KeyboardButton.WithRequestContact("Contact"),
-                });
-
-            return await botClient.SendTextMessageAsync(
-                chatId: message.Chat.Id,
-                text: "Who or Where are you?",
-                replyMarkup: RequestReplyKeyboard,
-                cancellationToken: cancellationToken);
-        }
-
-        static async Task<Message> Usage(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
-        {
-            const string usage = "MENU:\n" +
-                                 "/inline_keyboard - send inline keyboard\n" +
-                                 "/keyboard    - send custom keyboard\n" +
-                                 "/remove      - remove custom keyboard\n" +
-                                 "/photo       - send a photo\n" +
-                                 "/request     - request location or contact\n" +
-                                 "/inline_mode - send keyboard with Inline Query\n"+
-                                 "/SwitchtoInlinebuttons - SwitchtoInlinebuttons\n" +
-                                 "/SendCard - SendCard\n" +
-                                 "/sendLink - send githublink";
-
-            return await botClient.SendTextMessageAsync(
-                chatId: message.Chat.Id,
-                text: usage,
-                replyMarkup: new ReplyKeyboardRemove(),
-                cancellationToken: cancellationToken);
-        }
-
-        static async Task<Message> StartInlineQuery(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
-        {
-            InlineKeyboardMarkup inlineKeyboard = new(
-                InlineKeyboardButton.WithSwitchInlineQueryCurrentChat("Inline Mode"));
-
-            return await botClient.SendTextMessageAsync(
-                chatId: message.Chat.Id,
-                text: "Press the button to start Inline Query",
-                replyMarkup: inlineKeyboard,
+                text: "Menu",
+                replyMarkup: CreatKeyboardHelper.GetUserMenueyboard(),
                 cancellationToken: cancellationToken);
         }
     }
 
-    private async Task<bool> CreateUser(Message message,CancellationToken cancellationToken)
+    private async Task<Message> AdminPanel(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task<UserModel> CreateUser(Message message,CancellationToken cancellationToken)
     {
         var number = message.Contact?.PhoneNumber;
         
         if (number == null)
         {
-            var ShareContactKeyboard = CreatKeyboard.GetContactKeyboard();
+            var ShareContactKeyboard = CreatKeyboardHelper.GetContactKeyboard();
             await _botClient.SendTextMessageAsync(
                chatId: message!.Chat.Id,
                text: "لطفا شماره تلفن خود را ارسال کنید\n بدون اشتراک شماره تلفن خود امکان استفاده از بات را ندارید.",
                replyMarkup: ShareContactKeyboard,
                cancellationToken: cancellationToken);
             ;
-            return false;
+            return null;
         }
-     
-        UserModel? userWithRoles = null;
+     // Check There is a User With This Phone Number
+        var resultExistUserWithThisPhone = await MediatR.Send(new GetUserWithPhoneNumberQueryRequest(number));
+
+        if(resultExistUserWithThisPhone.IsSuccess)
+        {
+            // Update User And Send It Back
+         var resultUpdateBotUserId = await MediatR.Send(new UpdateBotUserIdRequest(resultExistUserWithThisPhone.Data, message.Chat.Id));
+           if(resultUpdateBotUserId.IsSuccess)
+            {
+                message.Text = BotNameHelper.Menu;
+                return resultExistUserWithThisPhone.Data;
+            }
+            return null;
+        }
+
+        // Create A User
+
+        UserModel? newUser = new UserModel(message.Chat.Id, number, RoleName.Customer) { };
 
 
-        var result = await MediatR.Send(new CreateUserCommandRequest(new UserModel(message.Chat.Id,number,(long)RoleName.Customer) { }));
+        var result = await MediatR.Send(new CreateUserCommandRequest(newUser));
                 
         if(result == null)
         {
@@ -289,13 +189,16 @@ public class UpdateHandlers
         if(!result!.IsSuccess)
         {
             await _botClient.SendTextMessageAsync(message.Chat.Id, "مشکلی پیش آمده با ادمین تماس حاصل فرمایید");
-            return false;
+            return null;
         }
 
-        await _botClient.SendTextMessageAsync(message.Chat.Id, "به ربات خرید پرفکت مانی خوش آمدید");
-
-
-
+        await _botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
+            text: "به ربات خرید پرفکت مانی خوش آمدید",
+            replyMarkup: new ReplyKeyboardRemove(),
+            cancellationToken: cancellationToken);
+        message.Text = BotNameHelper.Menu;
+        return newUser;
     }
 
     private async Task<Message> StartCard(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)

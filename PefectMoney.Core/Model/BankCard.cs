@@ -7,7 +7,7 @@ using PefectMoney.Core.Model;
 
 namespace PefectMoney.Core.Model
 {
-    public class BankCard : Base
+    public class BankCard : Base<long>
     {
         public string CartNumber { get; set; }
         public bool IsActive { get; set; }

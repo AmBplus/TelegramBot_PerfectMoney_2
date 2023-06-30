@@ -11,8 +11,8 @@ using PefectMoney.Data.DataBase;
 namespace PefectMoney.Data.Migrations
 {
     [DbContext(typeof(TelContext))]
-    [Migration("20230616064934_UpdateBotSettingTable")]
-    partial class UpdateBotSettingTable
+    [Migration("20230630021809_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,7 +21,33 @@ namespace PefectMoney.Data.Migrations
                 .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.BotSetting", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.BankCard", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CartNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BankCards");
+                });
+
+            modelBuilder.Entity("PefectMoney.Core.Model.BotSetting", b =>
                 {
                     b.Property<long>("id")
                         .ValueGeneratedOnAdd()
@@ -46,11 +72,11 @@ namespace PefectMoney.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.RoleModel", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.RoleModel", b =>
                 {
-                    b.Property<long>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime(6)");
@@ -58,33 +84,36 @@ namespace PefectMoney.Data.Migrations
                     b.Property<string>("Role")
                         .HasColumnType("longtext");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
-                    b.ToTable("RoleModel");
+                    b.ToTable("RoleModels");
 
                     b.HasData(
                         new
                         {
-                            id = 1L,
-                            CreationDate = new DateTime(2023, 6, 16, 11, 19, 34, 58, DateTimeKind.Local).AddTicks(2375),
+                            Id = 1,
+                            CreationDate = new DateTime(2023, 6, 30, 5, 48, 8, 599, DateTimeKind.Local).AddTicks(5829),
                             Role = "Admin"
                         },
                         new
                         {
-                            id = 2L,
-                            CreationDate = new DateTime(2023, 6, 16, 11, 19, 34, 58, DateTimeKind.Local).AddTicks(2407),
+                            Id = 2,
+                            CreationDate = new DateTime(2023, 6, 30, 5, 48, 8, 599, DateTimeKind.Local).AddTicks(5856),
                             Role = "Customer"
                         });
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.userModel", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.UserModel", b =>
                 {
-                    b.Property<long>("id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
                     b.Property<bool>("Active")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<long>("BotUserId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("ChatId")
                         .HasColumnType("longtext");
@@ -108,14 +137,14 @@ namespace PefectMoney.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.Property<long>("RoleId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserNameTelegram")
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.HasIndex("RoleId");
 
@@ -124,17 +153,38 @@ namespace PefectMoney.Data.Migrations
                     b.HasData(
                         new
                         {
-                            id = 1L,
+                            Id = 1L,
                             Active = true,
-                            CreationDate = new DateTime(2023, 6, 16, 11, 19, 34, 58, DateTimeKind.Local).AddTicks(3787),
+                            BotUserId = 0L,
+                            CreationDate = new DateTime(2023, 6, 30, 5, 48, 8, 599, DateTimeKind.Local).AddTicks(9497),
                             PhoneNumber = "+989394059810",
-                            RoleId = 1L
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Active = true,
+                            BotUserId = 0L,
+                            CreationDate = new DateTime(2023, 6, 30, 5, 48, 8, 599, DateTimeKind.Local).AddTicks(9510),
+                            PhoneNumber = "+989308505480",
+                            RoleId = 1
                         });
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.userModel", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.BankCard", b =>
                 {
-                    b.HasOne("TelegramBot_PerfectMoney.Model.RoleModel", "Roles")
+                    b.HasOne("PefectMoney.Core.Model.UserModel", "User")
+                        .WithMany("BankAccountNumbers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PefectMoney.Core.Model.UserModel", b =>
+                {
+                    b.HasOne("PefectMoney.Core.Model.RoleModel", "Roles")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -143,9 +193,14 @@ namespace PefectMoney.Data.Migrations
                     b.Navigation("Roles");
                 });
 
-            modelBuilder.Entity("TelegramBot_PerfectMoney.Model.RoleModel", b =>
+            modelBuilder.Entity("PefectMoney.Core.Model.RoleModel", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("PefectMoney.Core.Model.UserModel", b =>
+                {
+                    b.Navigation("BankAccountNumbers");
                 });
 #pragma warning restore 612, 618
         }

@@ -7,9 +7,10 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PefectMoney.Presentation.PresentationHelper.OperationBot
 {
-    internal static class CreatKeyboard
+    internal static class CreatKeyboardHelper
     {
         private static ReplyKeyboardMarkup? mainKeyboardMarkupForAdmin { get; set; }
+        private static ReplyKeyboardMarkup? UserMenuKeyboard { get; set; }
         private static ReplyKeyboardMarkup? AdminActiveSellingMainMarkup { get; set; }
         private static ReplyKeyboardMarkup? ShareContactKeyboradMarkup { get; set; }
         private static ReplyKeyboardMarkup? UserListKeyboardMarkup { get; set; }
@@ -19,6 +20,22 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
         private static ReplyKeyboardMarkup? BlockKeyboardMarkup { get; set; }
         private static ReplyKeyboardMarkup? AdminStopSellingMainMarkup { get; set; }
         private static ReplyKeyboardMarkup? MainKeyboardMarkUpForUser { get; set; }
+        public static ReplyKeyboardMarkup GetUserMenueyboard()
+        {
+            if (UserMenuKeyboard is null)
+            {
+                UserMenuKeyboard = new ReplyKeyboardMarkup(new[]
+                {
+                 new KeyboardButton[]{BotNameHelper.Law ,BotNameHelper.Cards},
+                 new KeyboardButton[]{BotNameHelper.BuyingProduct, BotNameHelper.PurchasedVuchers },
+                 new KeyboardButton[]{  BotNameHelper.AboutUs},
+
+                })
+                { InputFieldPlaceholder = "منو",IsPersistent = true,ResizeKeyboard = true};
+            }
+            return UserMenuKeyboard;
+        }
+
         public static ReplyKeyboardMarkup SetMainKeyboardMarkupForUser()
         {
             if (MainKeyboardMarkUpForUser is null)

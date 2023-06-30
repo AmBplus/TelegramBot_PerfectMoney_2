@@ -11,28 +11,28 @@ using System.Threading.Tasks;
 
 namespace PefectMoney.Core.UseCase.UserAction
 {
-    public class GetUserByIdQueryRequest : IRequest<UserModel?>
+    public class GetUserByBotUserIdQueryRequest : IRequest<UserModel?>
     {
         public long UserId { get; set; }
 
-        public GetUserByIdQueryRequest(long userId)
+        public GetUserByBotUserIdQueryRequest(long userId)
         {
             UserId = userId;
         }
     }
-    public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQueryRequest, UserModel?>
+    public class GetUserByBotUserIdQueryHandler : IRequestHandler<GetUserByBotUserIdQueryRequest, UserModel?>
     {
         ITelContext Context { get; set; }
 
-        public GetUserByIdQueryHandler(ITelContext context)
+        public GetUserByBotUserIdQueryHandler(ITelContext context)
         {
             Context = context;
         }
 
-        public async Task<UserModel?> Handle(GetUserByIdQueryRequest request, CancellationToken cancellationToken)
+        public async Task<UserModel?> Handle(GetUserByBotUserIdQueryRequest request, CancellationToken cancellationToken = default)
         {
             UserModel user;
-            var result = await Context.Users.FirstOrDefaultAsync(x => x.UserId == request.UserId);
+            var result = await Context.Users.FirstOrDefaultAsync(x => x.BotUserId == request.UserId, cancellationToken);
             return result;
           
         }

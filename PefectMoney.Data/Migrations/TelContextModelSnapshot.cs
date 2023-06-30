@@ -21,7 +21,7 @@ namespace PefectMoney.Data.Migrations
 
             modelBuilder.Entity("PefectMoney.Core.Model.BankCard", b =>
                 {
-                    b.Property<long>("id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
@@ -38,43 +38,18 @@ namespace PefectMoney.Data.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("BankCards");
                 });
 
-            modelBuilder.Entity("PefectMoney.Core.Model.BotSetting", b =>
-                {
-                    b.Property<long>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("RuleText")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("StopSelling")
-                        .HasColumnType("tinyint(1)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("botSettings");
-
-                    b.HasData(
-                        new
-                        {
-                            id = 1L,
-                            RuleText = "متنی وجود ندارد",
-                            StopSelling = false
-                        });
-                });
-
             modelBuilder.Entity("PefectMoney.Core.Model.RoleModel", b =>
                 {
-                    b.Property<long>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime(6)");
@@ -82,33 +57,36 @@ namespace PefectMoney.Data.Migrations
                     b.Property<string>("Role")
                         .HasColumnType("longtext");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.ToTable("RoleModels");
 
                     b.HasData(
                         new
                         {
-                            id = 1L,
-                            CreationDate = new DateTime(2023, 6, 28, 0, 26, 55, 550, DateTimeKind.Local).AddTicks(84),
+                            Id = 1,
+                            CreationDate = new DateTime(2023, 6, 30, 17, 54, 36, 591, DateTimeKind.Local).AddTicks(1671),
                             Role = "Admin"
                         },
                         new
                         {
-                            id = 2L,
-                            CreationDate = new DateTime(2023, 6, 28, 0, 26, 55, 550, DateTimeKind.Local).AddTicks(102),
+                            Id = 2,
+                            CreationDate = new DateTime(2023, 6, 30, 17, 54, 36, 591, DateTimeKind.Local).AddTicks(1687),
                             Role = "Customer"
                         });
                 });
 
             modelBuilder.Entity("PefectMoney.Core.Model.UserModel", b =>
                 {
-                    b.Property<long>("id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
                     b.Property<bool>("Active")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<long>("BotUserId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("ChatId")
                         .HasColumnType("longtext");
@@ -132,14 +110,14 @@ namespace PefectMoney.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.Property<long>("RoleId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserNameTelegram")
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.HasIndex("RoleId");
 
@@ -148,12 +126,40 @@ namespace PefectMoney.Data.Migrations
                     b.HasData(
                         new
                         {
-                            id = 1L,
+                            Id = 1L,
                             Active = true,
-                            CreationDate = new DateTime(2023, 6, 28, 0, 26, 55, 550, DateTimeKind.Local).AddTicks(1744),
+                            BotUserId = 0L,
+                            CreationDate = new DateTime(2023, 6, 30, 17, 54, 36, 591, DateTimeKind.Local).AddTicks(3409),
                             PhoneNumber = "+989394059810",
-                            RoleId = 1L
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Active = true,
+                            BotUserId = 0L,
+                            CreationDate = new DateTime(2023, 6, 30, 17, 54, 36, 591, DateTimeKind.Local).AddTicks(3418),
+                            PhoneNumber = "+989308505480",
+                            RoleId = 1
                         });
+                });
+
+            modelBuilder.Entity("PefectMoney.Core.Settings.BotSettings", b =>
+                {
+                    b.Property<long>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("RuleText")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("StopSelling")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("botSettings");
                 });
 
             modelBuilder.Entity("PefectMoney.Core.Model.BankCard", b =>

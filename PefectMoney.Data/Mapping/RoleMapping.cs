@@ -13,12 +13,12 @@ namespace PefectMoney.Data.Mapping
     {
         public void Configure(EntityTypeBuilder<RoleModel> builder)
         {
-            builder.HasKey(x => x.id);
+            builder.HasKey(x => x.Id);
             builder.HasMany(x => x.Users).WithOne(x => x.Roles).HasForeignKey(x => x.RoleId);
             builder.HasData(new List<RoleModel>()
             {
-                new RoleModel() { CreationDate = DateTime.Now, id = 1, Role = RoleName.Admin.ToString()},
-                new RoleModel() { CreationDate = DateTime.Now, id = 2, Role = RoleName.Customer.ToString() },
+                new RoleModel() { CreationDate = DateTime.Now, Id = RoleName.Admin, Role = nameof(RoleName.Admin)},
+                new RoleModel() { CreationDate = DateTime.Now, Id = RoleName.Customer, Role = nameof(RoleName.Customer) },
             });
         }
     }

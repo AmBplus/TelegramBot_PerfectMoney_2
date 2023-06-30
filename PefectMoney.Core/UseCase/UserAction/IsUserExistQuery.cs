@@ -30,9 +30,9 @@ namespace PefectMoney.Core.UseCase.UserAction;
 
     public ITelContext Context { get; }
 
-    public async Task<bool> Handle(IsUserExistRequest request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(IsUserExistRequest request, CancellationToken cancellationToken = default)
     {
-        var result = await Context.Users.AnyAsync(x => x.UserId == request.UserId);
+        var result = await Context.Users.AnyAsync(x => x.BotUserId == request.UserId,cancellationToken);
         return result;    
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using PefectMoney.Core.Model;
+using PefectMoney.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace PefectMoney.Core.Data
     public interface ITelContext : IDisposable, IAsyncDisposable , IDbContext
     {
         public DbSet<UserModel> Users { get; set; }
-        public DbSet<BotSetting> botSettings { get; set; }
+        public DbSet<BotSettings> botSettings { get; set; }
         public DbSet<RoleModel> RoleModels { get; set; }
         public DbSet<BankCard> BankCards { get; set; }
 

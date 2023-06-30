@@ -32,12 +32,12 @@ namespace PefectMoney.Core.UseCase.UserAction
             Logger = logger;
         }
 
-        public async Task<ResultOperation> Handle(CreateUserCommandRequest request, CancellationToken cancellationToken)
+        public async Task<ResultOperation> Handle(CreateUserCommandRequest request, CancellationToken cancellationToken = default)
         {
             try
             {
                 await Context.AddAsync(request.UserModel, cancellationToken);
-                await Context.SaveChangesAsync();
+                await Context.SaveChangesAsync(cancellationToken);
                 return ResultOperation.ToSuccessResult();
             }
             catch (Exception e)
