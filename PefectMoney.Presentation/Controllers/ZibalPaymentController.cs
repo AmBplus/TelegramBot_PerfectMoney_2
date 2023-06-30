@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PefectMoney.Core.UseCase.ZibalPayment;
 using Telegram.Bot;
 
 namespace PefectMoney.Presentation.Controllers
@@ -24,21 +25,35 @@ namespace PefectMoney.Presentation.Controllers
         //status وضعیت پرداخت(از طریق جدول وضعیت‌ها می‌توانید مقادیر status را مشاهده نمایید)
         //https://yourcallbackurl.com/callback?trackId=9900&success=1&status=2&orderId=1
         [HttpGet]
-        public async Task Get(string trackId,string success,int status,int orderId)
+        public async Task Get(RequestZibalPaymentCallBack request)
         {
-
-        }
+            
+            if(request.success == false)
+            {
+                // Code
+            }
+            ZibalVerifyPaymentRequestDto verifyRequest = new ZibalVerifyPaymentRequestDto
+            {
+                TrackId = request.trackId
+            };
+            var result = await Mediator.Send(verifyRequest);
+            if(result.IsSuccess)
+            {
+                // Code
+            }
+            // Code
+         }
 
     }
     public record RequestZibalPaymentCallBack
     {
         [FromQuery]
-        string trackId { get; set; }
+        public string trackId { get; set; }
         [FromQuery]
-        string success { get; set; }
+        public bool success { get; set; }
         [FromQuery]
-        int status { get; set; }
+        public int status { get; set; }
         [FromQuery]
-        int orderId { get; set; }
+        public int orderId { get; set; }
     }
 }

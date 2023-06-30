@@ -8,12 +8,12 @@
     }
   },
   "profiles": {
-    "Telegram.Bot.Examples.WebHook": {
+    "Telegram.Bot": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://42e9-104-200-151-117.ngrok-free.app;http://localhost:80"
+      "applicationUrl": "https://c5b3-2a03-ef43-5-3f09-8c-455e-ad7-4dab.ngrok-free.app;https://localhost:443"
     }
   }
 }

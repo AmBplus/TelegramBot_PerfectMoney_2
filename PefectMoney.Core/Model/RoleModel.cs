@@ -7,6 +7,11 @@ using PefectMoney.Core.Model;
 
 namespace PefectMoney.Core.Model
 {
+    public enum RoleName : long
+    {
+        Customer = 2 ,
+        Admin = 1
+    }
     public class RoleModel:Base
     {
         public string? Role { get; set; }
