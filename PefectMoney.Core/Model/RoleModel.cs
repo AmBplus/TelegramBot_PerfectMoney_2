@@ -15,7 +15,7 @@ namespace PefectMoney.Core.Model
     public class RoleModel: Base<int>
     {
         
-        public string? Role { get; set; }
+        public string Name { get; set; }
         public ICollection<UserModel> Users { get; set; }
 
         public RoleModel()

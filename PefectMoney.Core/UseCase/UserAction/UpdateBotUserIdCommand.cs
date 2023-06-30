@@ -14,15 +14,15 @@ namespace PefectMoney.Core.UseCase.UserAction
 {
     public class UpdateBotUserIdRequest  : IRequest<ResultOperation>
     {
+        public long UserModelId { get; }
 
-      public  UserModel UserModel { get; set; }
-      public long BotUserId { get; set; }
+        public long BotUserId { get; set; }
 
     
 
-        public UpdateBotUserIdRequest(UserModel userModel, long botUserId)
+        public UpdateBotUserIdRequest(long userModelId, long botUserId)
         {
-            UserModel = userModel;
+            UserModelId = userModelId;
             BotUserId = botUserId;
         }
     }
@@ -41,14 +41,14 @@ namespace PefectMoney.Core.UseCase.UserAction
         {
             try
             {
-                var user =  await Context.Users.FirstOrDefaultAsync(x=>x.Id == request.UserModel.Id, cancellationToken);
+                var user =  await Context.Users.FirstOrDefaultAsync(x=>x.Id == request.UserModelId, cancellationToken);
                 if (user == null)
                 {
                     Logger.LogError("کاربر ارسالی وجود خارجی در دیتابیس ندارد!");
                     return ResultOperation.ToFailedResult();
                
                 }
-                user.BotUserId = request.BotUserId;
+                user.BotChatId = request.BotUserId;
                 await Context.SaveChangesAsync(cancellationToken);
                 return ResultOperation.ToSuccessResult();
             }

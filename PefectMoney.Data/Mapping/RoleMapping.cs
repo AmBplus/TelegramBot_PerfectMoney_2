@@ -17,8 +17,8 @@ namespace PefectMoney.Data.Mapping
             builder.HasMany(x => x.Users).WithOne(x => x.Roles).HasForeignKey(x => x.RoleId);
             builder.HasData(new List<RoleModel>()
             {
-                new RoleModel() { CreationDate = DateTime.Now, Id = RoleName.Admin, Role = nameof(RoleName.Admin)},
-                new RoleModel() { CreationDate = DateTime.Now, Id = RoleName.Customer, Role = nameof(RoleName.Customer) },
+                new RoleModel() { CreationDate = DateTime.Now, Id = RoleName.Admin, Name = nameof(RoleName.Admin)},
+                new RoleModel() { CreationDate = DateTime.Now, Id = RoleName.Customer, Name = nameof(RoleName.Customer) },
             });
         }
     }

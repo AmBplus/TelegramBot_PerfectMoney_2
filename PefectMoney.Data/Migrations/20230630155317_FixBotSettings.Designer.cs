@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PefectMoney.Data.DataBase;
 
@@ -10,9 +11,10 @@ using PefectMoney.Data.DataBase;
 namespace PefectMoney.Data.Migrations
 {
     [DbContext(typeof(TelContext))]
-    partial class TelContextModelSnapshot : ModelSnapshot
+    [Migration("20230630155317_FixBotSettings")]
+    partial class FixBotSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,8 +56,7 @@ namespace PefectMoney.Data.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<string>("Role")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
@@ -66,14 +67,14 @@ namespace PefectMoney.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreationDate = new DateTime(2023, 7, 1, 1, 46, 43, 575, DateTimeKind.Local).AddTicks(7217),
-                            Name = "Admin"
+                            CreationDate = new DateTime(2023, 6, 30, 19, 23, 16, 732, DateTimeKind.Local).AddTicks(6824),
+                            Role = "Admin"
                         },
                         new
                         {
                             Id = 2,
-                            CreationDate = new DateTime(2023, 7, 1, 1, 46, 43, 575, DateTimeKind.Local).AddTicks(7234),
-                            Name = "Customer"
+                            CreationDate = new DateTime(2023, 6, 30, 19, 23, 16, 732, DateTimeKind.Local).AddTicks(6840),
+                            Role = "Customer"
                         });
                 });
 
@@ -86,8 +87,15 @@ namespace PefectMoney.Data.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<long>("BotChatId")
+                    b.Property<long>("BotUserId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("ChatId")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CodeId")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime(6)");
@@ -122,8 +130,8 @@ namespace PefectMoney.Data.Migrations
                         {
                             Id = 1L,
                             Active = true,
-                            BotChatId = 0L,
-                            CreationDate = new DateTime(2023, 7, 1, 1, 46, 43, 575, DateTimeKind.Local).AddTicks(9651),
+                            BotUserId = 0L,
+                            CreationDate = new DateTime(2023, 6, 30, 19, 23, 16, 732, DateTimeKind.Local).AddTicks(8938),
                             PhoneNumber = "+989394059810",
                             RoleId = 1
                         },
@@ -131,8 +139,8 @@ namespace PefectMoney.Data.Migrations
                         {
                             Id = 2L,
                             Active = true,
-                            BotChatId = 0L,
-                            CreationDate = new DateTime(2023, 7, 1, 1, 46, 43, 575, DateTimeKind.Local).AddTicks(9662),
+                            BotUserId = 0L,
+                            CreationDate = new DateTime(2023, 6, 30, 19, 23, 16, 732, DateTimeKind.Local).AddTicks(8945),
                             PhoneNumber = "+989308505480",
                             RoleId = 1
                         });

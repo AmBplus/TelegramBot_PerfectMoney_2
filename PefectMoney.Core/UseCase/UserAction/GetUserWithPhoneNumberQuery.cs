@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace PefectMoney.Core.UseCase.UserAction
 {
-    public class GetUserWithPhoneNumberQueryRequest : IRequest<ResultOperation<UserModel>>
+    public class GetUserWithPhoneNumberQueryRequest : IRequest<ResultOperation<UserDto>>
     {
         public string PhoneNumber { get; set; }
 
@@ -21,7 +21,7 @@ namespace PefectMoney.Core.UseCase.UserAction
             PhoneNumber = phoneNumber;
         }
     }
-    public class GetUserWithPhoneNumberQueryHandler : IRequestHandler<GetUserWithPhoneNumberQueryRequest, ResultOperation<UserModel>>
+    public class GetUserWithPhoneNumberQueryHandler : IRequestHandler<GetUserWithPhoneNumberQueryRequest, ResultOperation<UserDto>>
     {
         ITelContext Context { get; set; }
         public ILogger<GetUserWithPhoneNumberQueryHandler> Logger { get; }
@@ -32,21 +32,37 @@ namespace PefectMoney.Core.UseCase.UserAction
             Logger = logger;
         }
 
-        public async Task<ResultOperation<UserModel>> Handle(GetUserWithPhoneNumberQueryRequest request, CancellationToken cancellationToken = default)
+        public async Task<ResultOperation<UserDto>> Handle(GetUserWithPhoneNumberQueryRequest request, CancellationToken cancellationToken = default)
         {
             try
             {
-              var user = await Context.Users.FirstOrDefaultAsync(x => x.PhoneNumber!.Contains(request.PhoneNumber),cancellationToken);
+              var user = await Context.Users
+                    .Where(x => x.PhoneNumber!.Contains(request.PhoneNumber))
+                    .Select(x=> new UserDto
+                    {
+                        BotChatId = x.BotChatId,
+                        PhoneNumber = x.PhoneNumber,
+                        Id = x.Id,
+                        Roles = new RoleDto
+                        {
+                            Id = x.Roles!.Id,
+                            Name = x.Roles!.Name,
+                           
+                        }
+                        
+
+                    })
+                    .FirstOrDefaultAsync(cancellationToken);
                 if (user == null)
                 {
-                    return ResultOperation<UserModel>.ToFailedResult();
+                    return ResultOperation<UserDto>.ToFailedResult();
                 }
                 return user.ToSuccessResult();
             }
             catch (Exception e)
             {
                 Logger.LogError(e.Message);
-                return ResultOperation<UserModel>.ToFailedResult();
+                return ResultOperation<UserDto>.ToFailedResult();
             }
           
         }

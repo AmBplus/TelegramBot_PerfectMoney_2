@@ -14,11 +14,13 @@ namespace PefectMoney.Core.UseCase.UserAction
 {
     public record CreateUserCommandRequest : IRequest<ResultOperation>
     {
-       public  UserModel UserModel { get; set; }
+       
+        public UserDto UserDto { get; }
 
-        public CreateUserCommandRequest(UserModel userModel)
+        public CreateUserCommandRequest(UserDto userDto)
         {
-            UserModel = userModel;
+            
+            UserDto = userDto;
         }
     }
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommandRequest, ResultOperation>
@@ -36,7 +38,8 @@ namespace PefectMoney.Core.UseCase.UserAction
         {
             try
             {
-                await Context.AddAsync(request.UserModel, cancellationToken);
+                var user = new UserModel(request.UserDto.BotChatId, request.UserDto.PhoneNumber, request.UserDto.Roles.Id);
+                await Context.AddAsync(user, cancellationToken);
                 await Context.SaveChangesAsync(cancellationToken);
                 return ResultOperation.ToSuccessResult();
             }

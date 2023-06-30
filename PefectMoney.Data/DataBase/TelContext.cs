@@ -14,7 +14,7 @@ namespace PefectMoney.Data.DataBase
 
         private static string connectionString = "Server=localhost; User ID=root; Password=0903@m!rK; Database=TelBot";
         public DbSet<UserModel> Users { get; set; }
-        public DbSet<BotSettings> botSettings { get; set; }
+    
         public DbSet<BankCard> BankCards { get; set; }
         public DbSet<RoleModel> RoleModels{ get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

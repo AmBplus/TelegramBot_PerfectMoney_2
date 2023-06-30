@@ -25,6 +25,9 @@ namespace PefectMoney.Core.Settings
         private string _urlVerifyPaymentRequest;
         private string _urlInquiryPaymentRequest;
 
+
+        
+
         public string Merchant
         {
             get { return _merchant; }
@@ -37,6 +40,8 @@ namespace PefectMoney.Core.Settings
                 _merchant = value;
             }
         }
+
+
         public string BaseCallbackUrl
         {
             get { return _baseCallbackUrl; }

@@ -15,6 +15,9 @@ using MediatR;
 using PefectMoney.Core.UseCase.UserAction;
 using System.Threading;
 using PefectMoney.Core.Settings;
+using PefectMoney.Core.UseCase._BotSettings;
+using PefectMoney.Core.Extensions;
+using System.Text;
 
 namespace PefectMoney.Presentation.Services;
 
@@ -24,8 +27,8 @@ public class UpdateHandlers
    
     private readonly ITelegramBotClient _botClient;
     private readonly ILogger<UpdateHandlers> _logger;
+    public IMediator MediatR { get; }
 
-   
 
     public UpdateHandlers(ITelegramBotClient botClient,IMediator mediatR, ILogger<UpdateHandlers> logger)
     {
@@ -35,7 +38,7 @@ public class UpdateHandlers
         _logger = logger;
     }
 
-    public IMediator MediatR { get; }
+    
 
 #pragma warning disable IDE0060 // Remove unused parameter
 #pragma warning disable RCS1163 // Unused parameter.
@@ -52,7 +55,7 @@ public class UpdateHandlers
         _logger.LogInformation("HandleError: {ErrorMessage}", ErrorMessage);
         return Task.CompletedTask;
     }
-
+    
     public async Task HandleUpdateAsync(Telegram.Bot.Types.Update update, CancellationToken cancellationToken)
         {
 
@@ -71,10 +74,7 @@ public class UpdateHandlers
 
         await handler;
     }
-    private async Task ShareNumber()
-    {
-
-    }
+    
     private async Task BotOnMessageReceived(Message message, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Receive message type: {MessageType}", message.Type);
@@ -88,55 +88,196 @@ public class UpdateHandlers
         }
         if (message.Text is not { } messageText)
             return;
-        if (user.RoleId == RoleName.Admin)
+        ActionHelper.BotActions.TryGetValue(message.Chat.Id, out BotAction botAction);
+
+        if(botAction != null)
         {
-            var action =  AdminPanel(_botClient, message, cancellationToken);
+            await  HandleActions(_botClient, message,botAction,user, cancellationToken);
+            return;
+        }
+       
+
+
+        if (user.Roles.Id == RoleName.Admin)
+        {
+
+            var action = messageText switch
+            {
+
+                BotNameHelper.Law => ShowLaws(_botClient, message, cancellationToken),
+                BotNameHelper.AboutUs => AboutUs(_botClient, message, cancellationToken),
+                BotNameHelper.BuyingProduct => BuyingProduct(_botClient, message, cancellationToken),
+                BotNameHelper.Cards => Cards(_botClient, message, cancellationToken),
+                BotNameHelper.AdminPanel => AdminMenu(_botClient, message, cancellationToken),
+                _ => AdminMenu(_botClient, message, cancellationToken)
+            };
+
             Message sentMessage = await action;
             _logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
         }
-        else // User Panel
+        else // User 
         {
-
-            var action = messageText.Split(' ')[0] switch
+          
+            var action = messageText switch
             {
-      
+
                 BotNameHelper.Law => ShowLaws(_botClient, message, cancellationToken),
-                "/SendCard" => StartCard(_botClient, message, cancellationToken),
-                "/Menu" => UserMenu(_botClient, message, cancellationToken),
+                BotNameHelper.AboutUs => AboutUs(_botClient, message, cancellationToken),
+                BotNameHelper.BuyingProduct => BuyingProduct(_botClient, message, cancellationToken),
+                BotNameHelper.Cards => Cards(_botClient, message, cancellationToken),
+                BotNameHelper.AddNewCard => AddNewCard(_botClient, message, cancellationToken),
+                BotNameHelper.RegisteredCards => RegisteredCards(_botClient, message, cancellationToken),
+                BotNameHelper.Menu => UserMenu(_botClient, message, cancellationToken),
                 _ => UserMenu(_botClient, message, cancellationToken)
             };
+
             Message sentMessage = await action;
             _logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
         }
-
-        static async Task<Message> ShowLaws(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
-        {
-            return await botClient.SendTextMessageAsync(
-               chatId: message.Chat.Id,
-               text: "",
-               replyMarkup: CreatKeyboardHelper.GetUserMenueyboard(),
-               cancellationToken: cancellationToken);
-        }
-
+    
 
         static async Task<Message> UserMenu(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
         {
-
-          
-
-
-
-
-
-            //    return AdminActiveSellingMainMarkup;
-
-
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Menu",
-                replyMarkup: CreatKeyboardHelper.GetUserMenueyboard(),
+                replyMarkup: CreatKeyboardHelper.GetUserMenuKeyBoard(),
                 cancellationToken: cancellationToken);
         }
+    }
+
+    private async Task HandleActions(ITelegramBotClient botClient, Message message,BotAction botAction,UserDto userDto, CancellationToken cancellationToken)
+    {
+        switch (botAction.ActionName)
+        {
+            case BotNameHelper.SeeRegisteredCards :
+            {
+                    await SeeRegisteredCards(botClient, message, cancellationToken);
+                    return;
+            }
+            
+
+            default: break;
+        }
+
+    }
+
+    private async Task<Message> SeeRegisteredCards(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+    {
+
+        var userResult = await MediatR.Send(new GetUserCardsRequest(message.Chat.Id));
+        string text;
+        if (userResult.IsSuccess == false)
+            text = userResult.Message!.ToStringEnumerable();
+        else
+        {
+            if (userResult.Data.UserCards == null)
+            {
+                text = "کارتی ثبت نشده";
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (var item in userResult.Data!.UserCards)
+                {
+                    sb.AppendLine($"شماره کارت ثبت شده : {item.CardNumber}");
+                }
+                text = sb.ToString();
+            }
+        }
+        ActionHelper.BotActions.Remove(message.Chat.Id);
+        return await botClient.SendTextMessageAsync(
+               chatId: message.Chat.Id,
+               text: text,
+               replyMarkup: new ReplyKeyboardRemove(),
+               cancellationToken: cancellationToken);
+
+    }
+    private async Task<Message> RegisteredCards(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+    {
+
+            ActionHelper.BotActions.Add(message.Chat.Id, new BotAction { ActionName = BotNameHelper.SeeRegisteredCards, ActionStatus = ActionStatus.OnProccess });
+        
+            return await botClient.SendTextMessageAsync(
+                   chatId: message.Chat.Id,
+                   text: "کارت خود را وارد نمایید",
+                   replyMarkup: new ReplyKeyboardRemove(),
+                   cancellationToken: cancellationToken);
+    
+    }
+
+    private async Task<Message> AddNewCard(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+    {
+        
+        ActionHelper.BotActions.Add(message.Chat.Id, new BotAction { ActionName = BotNameHelper.AddNewCard, ActionStatus = ActionStatus.OnProccess });
+        if(ActionHelper.BotActions.ContainsKey(message.Chat.Id))
+        {
+
+        }
+        return await botClient.SendTextMessageAsync(
+               chatId: message.Chat.Id,
+               text: "کارت خود را وارد نمایید",
+               replyMarkup: new ReplyKeyboardRemove(),
+               cancellationToken: cancellationToken);
+   
+    }
+    private async Task<Message> NewCard(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+    {
+
+        ActionHelper.BotActions.Add(message.Chat.Id, new BotAction { ActionName = BotNameHelper.AddNewCard, ActionStatus = ActionStatus.OnProccess });
+        if (ActionHelper.BotActions.ContainsKey(message.Chat.Id))
+        {
+
+        }
+        return await botClient.SendTextMessageAsync(
+               chatId: message.Chat.Id,
+               text: "کارت خود را وارد نمایید",
+               replyMarkup: new ReplyKeyboardRemove(),
+               cancellationToken: cancellationToken);
+
+    }
+
+    private async Task<Message> AdminMenu(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+    {
+        return await botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
+            text: "Menu",
+            replyMarkup: CreatKeyboardHelper.GetUserMenuKeyBoard(),
+            cancellationToken: cancellationToken);
+    }
+
+    private async Task<Message> Cards(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+    {
+        return await botClient.SendTextMessageAsync(
+                 chatId: message.Chat.Id,
+                 text: "منو کارت ها",
+                 replyMarkup: CreatKeyboardHelper.GetCardsMenuKeyBoard(),
+                 cancellationToken: cancellationToken);
+    }
+
+    private Task<Message> BuyingProduct(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task<Message> AboutUs(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+    {
+        var settings = await MediatR.Send(new GetBotSettingsRequest(), cancellationToken);
+        return await botClient.SendTextMessageAsync(
+           chatId: message.Chat.Id,
+           text: settings.AboutUs,
+           replyMarkup: CreatKeyboardHelper.GetUserMenuKeyBoard(),
+           cancellationToken: cancellationToken);
+    }
+
+    private  async Task<Message> ShowLaws(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+    {
+        var settings = await MediatR.Send(new GetBotSettingsRequest(), cancellationToken);
+        return await botClient.SendTextMessageAsync(
+           chatId: message.Chat.Id,
+           text: settings.RuleTextAsOneString,
+           replyMarkup: CreatKeyboardHelper.GetUserMenuKeyBoard(),
+           cancellationToken: cancellationToken);
     }
 
     private async Task<Message> AdminPanel(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
@@ -144,7 +285,7 @@ public class UpdateHandlers
         throw new NotImplementedException();
     }
 
-    private async Task<UserModel> CreateUser(Message message,CancellationToken cancellationToken)
+    private async Task<UserDto> CreateUser(Message message,CancellationToken cancellationToken)
     {
         var number = message.Contact?.PhoneNumber;
         
@@ -165,7 +306,7 @@ public class UpdateHandlers
         if(resultExistUserWithThisPhone.IsSuccess)
         {
             // Update User And Send It Back
-         var resultUpdateBotUserId = await MediatR.Send(new UpdateBotUserIdRequest(resultExistUserWithThisPhone.Data, message.Chat.Id));
+         var resultUpdateBotUserId = await MediatR.Send(new UpdateBotUserIdRequest(resultExistUserWithThisPhone.Data.Id, message.Chat.Id));
            if(resultUpdateBotUserId.IsSuccess)
             {
                 message.Text = BotNameHelper.Menu;
@@ -175,9 +316,8 @@ public class UpdateHandlers
         }
 
         // Create A User
-
-        UserModel? newUser = new UserModel(message.Chat.Id, number, RoleName.Customer) { };
-
+        var roleDto =  new RoleDto() { Id = RoleName.Customer };
+        UserDto? newUser = new UserDto() { BotChatId = message.Chat.Id,PhoneNumber =  number,Roles = roleDto };
 
         var result = await MediatR.Send(new CreateUserCommandRequest(newUser));
                 
@@ -225,7 +365,7 @@ public class UpdateHandlers
         text: "switch_inline_query"),
     InlineKeyboardButton.WithSwitchInlineQueryCurrentChat(
         text: "switch_inline_query_current_chat"),
-});
+});   
 
         return await botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,

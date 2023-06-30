@@ -14,7 +14,7 @@ namespace PefectMoney.Core.Data
     public interface ITelContext : IDisposable, IAsyncDisposable , IDbContext
     {
         public DbSet<UserModel> Users { get; set; }
-        public DbSet<BotSettings> botSettings { get; set; }
+
         public DbSet<RoleModel> RoleModels { get; set; }
         public DbSet<BankCard> BankCards { get; set; }
 

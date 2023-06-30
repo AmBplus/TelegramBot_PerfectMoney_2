@@ -16,8 +16,7 @@ namespace PefectMoney.Data.Mapping
             builder.HasKey(x => x.Id);
             builder.Property(x => x.FirstName).HasMaxLength(200).IsRequired(false);
             builder.Property(x => x.LastName).HasMaxLength(200).IsRequired(false);
-            builder.Property(x => x.CodeId).HasMaxLength(200).IsRequired(false);
-            builder.Property(x => x.ChatId).IsRequired(false);
+      
             builder.Property(x => x.Active);
             builder.Property(x => x.CreationDate);
             builder.Property(x => x.PhoneNumber).HasMaxLength(200).IsRequired(false);
