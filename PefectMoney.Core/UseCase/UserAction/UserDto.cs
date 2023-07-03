@@ -13,5 +13,7 @@ namespace PefectMoney.Core.UseCase.UserAction
         public long BotChatId { get; set; }
         public RoleDto Roles { get; set; }
         public string PhoneNumber { get; set; }
+        public bool IsActive { get; set; }
+        public IEnumerable<UserCardsDto> Cards { get; set; }   
     }
 }

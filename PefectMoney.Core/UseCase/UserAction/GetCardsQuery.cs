@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PefectMoney.Core.Data;
 using PefectMoney.Shared.Utility.ResultUtil;
-using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore;
 
 
 namespace PefectMoney.Core.UseCase.UserAction
@@ -14,7 +14,7 @@ namespace PefectMoney.Core.UseCase.UserAction
     public record GetUserCardsResponse(long ChatId)
     {
      
-        public IList<UserCardsResponseDto> UserCards { get; set; } 
+        public IList<UserCardsDto> UserCards { get; set; } 
     }
     public class GetUserCardsHandler : IRequestHandler<GetUserCardsRequest,ResultOperation<GetUserCardsResponse>>
     {
@@ -35,7 +35,7 @@ namespace PefectMoney.Core.UseCase.UserAction
                 {
                     UserCards = x.BankAccountNumbers.Where(b => b.IsActive)
                    .Select(b =>
-                     new UserCardsResponseDto(b.CartNumber) { }).ToList(),
+                     new UserCardsDto(b.CartNumber) { }).ToList(),
 
                 }).FirstOrDefault();
               if(result==null)
@@ -51,9 +51,5 @@ namespace PefectMoney.Core.UseCase.UserAction
             }
           
         }
-    }
-    public record UserCardsResponseDto(string CardNumber)
-    {
-       
     }
 }

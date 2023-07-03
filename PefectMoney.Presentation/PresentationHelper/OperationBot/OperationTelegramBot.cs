@@ -19,7 +19,7 @@
 
 //namespace PefectMoney.Presentation.PresentationHelper.OperationBot
 //{
-//    public class OperationTelegramBot:IOperationTelegramBot
+//    public class OperationTelegramBot : IOperationTelegramBot
 //    {
 //        // private static int number = 1;
 //        private static string SavePhonNumber { get; set; }
@@ -29,118 +29,16 @@
 //        {
 //            _context = context;
 //            Persian = new PersianCalendar();
-            
+
 //        }
 
-//        public  async Task Start(ITelegramBotClient botClient,Update update, CancellationToken cancellationToken)
-//        {
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles)
-//                .FirstOrDefaultAsync();
-//            if (role == null)
-//            {
-//                var ShareContactKeyboard = CreatKeyboard.GetContactKeyboard();
-//                Message sentMessage = await botClient.SendTextMessageAsync(
-//                    chatId: update.Message!.Chat.Id,
-//                    text: "لطفا شماره تلفن خود را ارسال کنید",
-//                    replyMarkup: ShareContactKeyboard,
-//                    cancellationToken: cancellationToken);
-//                return;
-//            }
-//           else if (role.Roles.Role == "Admin")
-//            {
-//                if (role.ChatId == null)
-//                {
-//                    role.ChatId = update.Message.Chat.Id.ToString();
-//                    _context.Update(role);
-//                    _context.SaveChanges();
-//                }
-//                var mainKeyboardMarkup = CreatKeyboard.SetMainKeyboardMarkupForAdmin();
-//                UserStepHandler.DeleteAll(update.Message.Chat.Id.ToString());
-//                Message sentMessage = await botClient.SendTextMessageAsync(
-//                    chatId: update.Message!.Chat.Id,
-//                    text: "به بات خرید پرفکت مانی خوش آمدید.",
-//                    replyMarkup: mainKeyboardMarkup,
-//                    cancellationToken: cancellationToken);
-//                return;
-//            }
-//            else
-//            {
-//                var mainKeyboardMarkup = CreatKeyboard.SetMainKeyboardMarkupForUser();
-//                UserStepHandler.DeleteAll(update.Message.Chat.Id.ToString());
-//                Message sentMessage = await botClient.SendTextMessageAsync(
-//                    chatId: update.Message!.Chat.Id,
-//                    text: "به بات خرید پرفکت مانی خوش آمدید.",
-//                    replyMarkup: mainKeyboardMarkup,
-//                    cancellationToken: cancellationToken);
-//            }
-//            // var user = new UserModel()
-//            // {
-//            //     ChatId = update.Message!.Chat.Id,
-//            //     CodeId = "1111111",
-//            //     FirstName = "ali",
-//            //     LastName = "hey",
-//            //     MessageId = update.Message.MessageId,
-//            //     PhoneNumber = "09104",
-//            //     UserNameTelegram = update.Message.Chat.Username!
-//            // };
-//            // _context.Users.Add(user);
-//            // _context.SaveChanges();
-            
-            
-//        }
+      
 
-//        public async Task AdminMainSection(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
-//        {
-
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles)
-//                .FirstOrDefaultAsync();
-//            if (role is not  null&&role?.Roles?.Role == "Admin")
-//            {
-//                var CheckSelling = _context.botSettings.Select(x => x.StopSelling).FirstOrDefault();
-//                if (CheckSelling == false)
-//                {
-//                    var Adminkeyboard = CreatKeyboard.SetAdminStopSellingKeyboard();
-//                    UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), Adminkeyboard);
-//                    Message sentMessage = await botClient.SendTextMessageAsync(
-//                        chatId: update.Message!.Chat.Id,
-//                        text: "پنل مدیریت",
-//                        replyMarkup: Adminkeyboard,
-//                        cancellationToken: cancellationToken);
-//                    return;
-//                }
-//                else
-//                {
-//                    var Adminkeyboard = CreatKeyboard.SetAdminActiveSellingMainKeyboard();
-//                    UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), Adminkeyboard);
-//                    Message sentMessage = await botClient.SendTextMessageAsync(
-//                        chatId: update.Message!.Chat.Id,
-//                        text: "پنل مدیریت",
-//                        replyMarkup: Adminkeyboard,
-//                        cancellationToken: cancellationToken);
-//                    return;
-//                }
-//            }
-//            else
-//            {
-//               await botClient.SendTextMessageAsync(update.Message.Chat.Id, "دسترسی شما به این قسمت مجاز نیس.",
-//                    cancellationToken: cancellationToken);
-//            }
-           
-//        }
-
-//        public async Task GetContact(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
-//        {
-//            var ShareContactKeyboard = CreatKeyboard.GetContactKeyboard();
-//            Message sentMessage = await botClient.SendTextMessageAsync(
-//                chatId: update.Message!.Chat.Id,
-//                text: "لطفا با کلیک بر دکمه ارسال شماره تلفن ، شماره خود را برای ما ارسال نمایید",
-//                replyMarkup: ShareContactKeyboard,
-//                cancellationToken: cancellationToken);
-//        }
+       
 
 //        public async Task AdminUserListSection(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 //        {
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
+//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x => x.Roles.Role)
 //                .FirstOrDefaultAsync();
 //            if (role == "Admin")
 //            {
@@ -155,71 +53,22 @@
 //            }
 //            else
 //            {
-//               await botClient.SendTextMessageAsync(update.Message.Chat.Id, "دسترسی شما به این قسمت مجاز نیس.",
-//                    cancellationToken: cancellationToken);
+//                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "دسترسی شما به این قسمت مجاز نیس.",
+//                     cancellationToken: cancellationToken);
 //            }
 //        }
 
-//        public async Task BackToMainSection(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+
+//        public async Task GetUserList(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken, string page)
 //        {
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
-//                .FirstOrDefaultAsync();
-//            if (role == "Admin")
-//            {
-//                UserStepHandler.DeleteAll(update.Message.Chat.Id.ToString());
-//                var mainKeyboardMarkup = CreatKeyboard.SetMainKeyboardMarkupForAdmin();
-
-//                Message sentMessage = await botClient.SendTextMessageAsync(
-//                    chatId: update.Message!.Chat.Id,
-//                    text: "صفحه اصلی",
-//                    replyMarkup: mainKeyboardMarkup,
-//                    cancellationToken: cancellationToken);
-//                return;
-//            }
-//            else
-//            {
-//                UserStepHandler.DeleteAll(update.Message.Chat.Id.ToString());
-//                var mainKeyboardMarkup = CreatKeyboard.SetMainKeyboardMarkupForUser();
-
-//                Message sentMessage = await botClient.SendTextMessageAsync(
-//                    chatId: update.Message!.Chat.Id,
-//                    text: "صفحه اصلی",
-//                    replyMarkup: mainKeyboardMarkup,
-//                    cancellationToken: cancellationToken);
-//                return;
-//            }
-//        }
-
-//        public async Task BackToPreviousnStep(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
-//        {
-//            var chatId = update.Message.Chat.Id;
-
-//            UserStepHandler.RemoveCurentUserLastStep(chatId.ToString());
-
-//            var lastStep = UserStepHandler.GetUserLastStep(chatId.ToString());
-            
-//            if (lastStep != null)
-//            {
-//                await botClient.SendTextMessageAsync(chatId, $"یکی از گزینه های زیر را انتخاب کنید",replyMarkup:lastStep, cancellationToken: cancellationToken);
-                
-//            }
-//            else
-//            {
-//                // در صورت عدم وجود مرحله قبلی
-//               await botClient.SendTextMessageAsync(chatId, "مرحله قبلی یافت نشد لطفا وارد صفحه اصلی شوید.", cancellationToken: cancellationToken);
-//            }
-//        }
-
-//        public async Task GetUserList(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken,string page)
-//        {
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
+//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x => x.Roles.Role)
 //                .FirstOrDefaultAsync();
 //            if (role == "Admin")
 //            {
 //                var key = CreatKeyboard.PaginitionUserListKeyboard();
 //                var AllCount = _context.Users.Count();
 
-//                var result = await _context.Users.Where(x=>x.RoleId !=1).Include(x=>x.Roles).Skip((Convert.ToInt32(page) - 1) * 10).Take(10).ToListAsync();
+//                var result = await _context.Users.Where(x => x.RoleId != 1).Include(x => x.Roles).Skip((Convert.ToInt32(page) - 1) * 10).Take(10).ToListAsync();
 //                if (result.Count == 0)
 //                {
 //                    await botClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "اطلاعات وجود ندارد", cancellationToken: cancellationToken);
@@ -241,18 +90,18 @@
 //                    text.AppendLine($"کد ملی : {item.CodeId} ------ وضعیت فعالی : {activeText}");
 //                    text.AppendLine($"تاریخ ثبت نام : {year}/{month}/{day} ------ ساعت ثبت نام : {hour}:{minute}");
 //                    text.AppendLine();
-//                    text.AppendLine("------------------------------------------------");
+//                    text.AppendLine("-----------------------------------");
 //                    text.AppendLine();
 //                }
 
 //                if (result.Count < 10 && AllCount < 10)
 //                {
-//                    await botClient.SendTextMessageAsync(update.Message.Chat.Id, text.ToString(), cancellationToken: cancellationToken,replyMarkup:CreatKeyboard.BackKeyboards());
+//                    await botClient.SendTextMessageAsync(update.Message.Chat.Id, text.ToString(), cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BackKeyboards());
 //                    UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
 
 //                    return;
 //                }
-//                if (result.Count < 10 )
+//                if (result.Count < 10)
 //                {
 //                    await botClient.EditMessageTextAsync(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Message.MessageId, text.ToString(), cancellationToken: cancellationToken);
 //                    await botClient.EditMessageReplyMarkupAsync(update.CallbackQuery.Message.Chat.Id,
@@ -291,8 +140,8 @@
 //                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "دسترسی شما به این قسمت مجاز نیس.",
 //                    cancellationToken: cancellationToken);
 //            }
-            
-           
+
+
 
 //        }
 
@@ -308,7 +157,7 @@
 
 //        public async Task SearchUserByPhoneNumber(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 //        {
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
+//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x => x.Roles.Role)
 //                .FirstOrDefaultAsync();
 //            if (role == "Admin")
 //            {
@@ -366,12 +215,12 @@
 //                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "دسترسی شما به این قسمت مجاز نیس.",
 //                    cancellationToken: cancellationToken);
 //            }
-           
+
 //        }
 
 //        public async Task ActiveUser(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 //        {
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
+//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x => x.Roles.Role)
 //                .FirstOrDefaultAsync();
 //            if (role == "Admin")
 //            {
@@ -390,8 +239,8 @@
 //                    cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BlockUser());
 //                UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BlockUser());
 //                var chatid = new ChatId(user.ChatId);
-                
-               
+
+
 //                await botClient.SendTextMessageAsync(chatid, "تبریک! کاربر محترم مسدودیت شما برطرف شد.",
 //                    cancellationToken: cancellationToken);
 //                return;
@@ -406,7 +255,7 @@
 
 //        public async Task BlockUser(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 //        {
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
+//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x => x.Roles.Role)
 //                .FirstOrDefaultAsync();
 //            if (role == "Admin")
 //            {
@@ -425,10 +274,10 @@
 //                UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.ActivUser());
 //                var chatid = new ChatId(user.ChatId);
 
-                
+
 //                await botClient.SendTextMessageAsync(Convert.ToInt64(user.ChatId),
-//                    "کاربر محترم شما مسدود شدید. لطفا به ادمین پیام دهید",cancellationToken:cancellationToken);
-              
+//                    "کاربر محترم شما مسدود شدید. لطفا به ادمین پیام دهید", cancellationToken: cancellationToken);
+
 //            }
 //            else
 //            {
@@ -439,7 +288,7 @@
 
 //        public async Task SendMessageToUser(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 //        {
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
+//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x => x.Roles.Role)
 //                .FirstOrDefaultAsync();
 //            if (role == "Admin")
 //            {
@@ -463,12 +312,12 @@
 //                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "دسترسی شما به این قسمت مجاز نیس.",
 //                    cancellationToken: cancellationToken);
 //            }
-                
+
 //        }
 
 //        public async Task SendMessageToAllUsers(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 //        {
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
+//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x => x.Roles.Role)
 //                .FirstOrDefaultAsync();
 //            if (role == "Admin")
 //            {
@@ -492,7 +341,7 @@
 
 //        public async Task ActivSelling(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 //        {
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
+//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x => x.Roles.Role)
 //                .FirstOrDefaultAsync();
 //            if (role == "Admin")
 //            {
@@ -506,7 +355,7 @@
 //                    text: "فروش شروع شد",
 //                    replyMarkup: Adminkeyboard,
 //                    cancellationToken: cancellationToken);
-//                var AllUser = await _context.Users.Where(x => x.RoleId != 1).Include(x => x.Roles).Select(x=>x.ChatId).ToListAsync();
+//                var AllUser = await _context.Users.Where(x => x.RoleId != 1).Include(x => x.Roles).Select(x => x.ChatId).ToListAsync();
 //                foreach (var item in AllUser)
 //                {
 //                    await botClient.SendTextMessageAsync(Convert.ToInt64(item),
@@ -523,7 +372,7 @@
 
 //        public async Task StopSelling(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 //        {
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
+//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x => x.Roles.Role)
 //                .FirstOrDefaultAsync();
 //            if (role == "Admin")
 //            {
@@ -554,7 +403,7 @@
 
 //        public async Task StopBot(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 //        {
-//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x=>x.Roles.Role)
+//            var role = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles).Select(x => x.Roles.Role)
 //                .FirstOrDefaultAsync();
 //            if (role == "Admin")
 //            {
@@ -592,22 +441,22 @@
 //                };
 //                _context.Users.Add(NewUser);
 //                _context.SaveChanges();
-//               await botClient.SendTextMessageAsync(update.Message.Chat.Id,
-//                    "شماره تلفن شما ثبت شد لطفا برای تکمیل اطلاعات به پنل احراز هویت مراحعه فرمایید.",
-//                    cancellationToken: cancellationToken,replyMarkup:CreatKeyboard.SetMainKeyboardMarkupForUser());
+//                await botClient.SendTextMessageAsync(update.Message.Chat.Id,
+//                     "شماره تلفن شما ثبت شد لطفا برای تکمیل اطلاعات به پنل احراز هویت مراحعه فرمایید.",
+//                     cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.SetMainKeyboardMarkupForUser());
 //            }
 
-//           else if (user.Roles.Role == "Admin")
+//            else if (user.Roles.Role == "Admin")
 //            {
 //                user.FirstName = user.FirstName ?? update.Message.Contact.FirstName;
 //                user.LastName = user.LastName ?? update.Message.Contact.LastName;
 //                user.ChatId = user.ChatId ?? update.Message.Chat.Id.ToString();
 //                _context.Update(user);
 //                _context.SaveChanges();
-//               await botClient.SendTextMessageAsync(update.Message.Chat.Id, "خوش آمدید",
-//                    cancellationToken: cancellationToken,replyMarkup:CreatKeyboard.SetMainKeyboardMarkupForAdmin());
+//                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "خوش آمدید",
+//                     cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.SetMainKeyboardMarkupForAdmin());
 
-//               // UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(),CreatKeyboard.SetMainKeyboardMarkupForAdmin());
+//                // UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(),CreatKeyboard.SetMainKeyboardMarkupForAdmin());
 //            }
 //            else
 //            {
@@ -629,7 +478,7 @@
 //                    await botClient.SendTextMessageAsync(update.Message.Chat.Id,
 //                        "متن قوانین وجود ندارد لطفا متنی وارد کنید.", replyMarkup: CreatKeyboard.BackKeyboards(),
 //                        cancellationToken: cancellationToken);
-//                    UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(),CreatKeyboard.BackKeyboards());
+//                    UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
 //                }
 //                var stringBuilder = new StringBuilder();
 //                stringBuilder.AppendLine("لطفا برای تغییر متن قوانین بات، متن خود را با فرمت زیر بنویسید. جهت سهولت میتوانید از این متن کپی بگیرید.");
@@ -638,7 +487,7 @@
 //                    cancellationToken: cancellationToken, replyMarkup: CreatKeyboard.BackKeyboards());
 //                await botClient.SendTextMessageAsync(update.Message.Chat.Id, stringBuilder.ToString(),
 //                    cancellationToken: cancellationToken);
-//                UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(),CreatKeyboard.BackKeyboards());
+//                UserStepHandler.AddUserStep(update.Message.Chat.Id.ToString(), CreatKeyboard.BackKeyboards());
 //                return;
 //            }
 
@@ -657,7 +506,7 @@
 //                var textRule = await _context.botSettings.FirstOrDefaultAsync();
 //                var seprator = "متن قوانین:";
 //                int index = update.Message.Text.IndexOf(seprator) + seprator.Length;
-//                var result =update.Message.Text.Substring(index);
+//                var result = update.Message.Text.Substring(index);
 //                textRule.RuleText = result;
 //                _context.Update(textRule);
 //                _context.SaveChanges();
@@ -672,7 +521,7 @@
 
 //        public async Task GetRuleText(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
 //        {
-//            var user =await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles)
+//            var user = await _context.Users.Where(x => x.ChatId == update.Message.Chat.Id.ToString()).Include(x => x.Roles)
 //                .FirstOrDefaultAsync();
 //            if (user == null)
 //            {

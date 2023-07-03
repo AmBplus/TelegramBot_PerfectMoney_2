@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-using Telegram.Bot;
+
 
 namespace PefectMoney.Presentation.Controllers
 {
@@ -11,13 +11,11 @@ namespace PefectMoney.Presentation.Controllers
     [ApiController]
     public class ZibalPaymentController : ControllerBase
     {
-        public ZibalPaymentController(ITelegramBotClient botClient, IMediator mediator)
+        public ZibalPaymentController(IMediator mediator)
         {
-            BotClient = botClient;
+         
             Mediator = mediator;
         }
-
-        public ITelegramBotClient BotClient { get; }
         public IMediator Mediator { get; }
         //        در صورت موفقیت‌آمیز بودن تراکنش 1، در غیر این‌صورت 0 می‌باشد.
         //trackId شناسه پیگیری جلسه‌ی پرداخت

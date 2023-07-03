@@ -7,13 +7,23 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PefectMoney.Presentation.PresentationHelper.OperationBot
 {
-    internal static class CreatKeyboardHelper
+    internal static class CreateKeyboardHelper
     {
 
         private static ReplyKeyboardMarkup? ShareContactKeyboradMarkup { get; set; }
         private static ReplyKeyboardMarkup? CardsMenuKeyBoards{ get; set; }
+        private static InlineKeyboardMarkup? Pagniate_Cancel_Menu_KeyBoards{ get; set; }
+        private static InlineKeyboardMarkup? StopSelling_MenuKeyBoard{ get; set; }
+        private static InlineKeyboardMarkup? Accept_UnAccept_Menu_MenuKeyBoard{ get; set; }
+        private static InlineKeyboardMarkup? StopBot_MenuKeyBoard{ get; set; }
+        private static InlineKeyboardMarkup? UserPaginationMenuKeyBorad{ get; set; }
+        private static ReplyKeyboardMarkup? GetMenuKeyBoards{ get; set; }
+        private static ReplyKeyboardMarkup? AcceptCancelKeyBoard{ get; set; }
+        private static ReplyKeyboardMarkup? MenuCancelKeyBoard{ get; set; }
+        private static ReplyKeyboardMarkup? AdminLawKeyBoard{ get; set; }
 
         private static ReplyKeyboardMarkup? AdminMenuKeyboard { get; set; }
+        private static ReplyKeyboardMarkup? AdminPanelKeyboard { get; set; }
         private static ReplyKeyboardMarkup? UserMenuKeyboard { get; set; }
         private static ReplyKeyboardMarkup? AdminActiveSellingMainMarkup { get; set; }
 
@@ -24,6 +34,162 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
         private static ReplyKeyboardMarkup? BlockKeyboardMarkup { get; set; }
         private static ReplyKeyboardMarkup? AdminStopSellingMainMarkup { get; set; }
         private static ReplyKeyboardMarkup? MainKeyboardMarkUpForUser { get; set; }
+        public static InlineKeyboardMarkup Get_Accept_UnAccept_Menu_MenuKeyBoard()
+        {
+            if (Accept_UnAccept_Menu_MenuKeyBoard is null)
+            {
+                Accept_UnAccept_Menu_MenuKeyBoard = new(new[]
+                {
+
+                   new []
+                 {
+                        InlineKeyboardButton.WithCallbackData(text: "تایید", callbackData: BotNameHelper.AcceptAction),
+                        InlineKeyboardButton.WithCallbackData(text: "کنسل", callbackData: BotNameHelper.CancelAction),
+                },
+
+                   new []
+                {
+                        InlineKeyboardButton.WithCallbackData(text: "منو اصلی", callbackData: BotNameHelper.Menu),
+
+                },
+
+                });
+            }
+
+
+            return Accept_UnAccept_Menu_MenuKeyBoard;
+        }
+        public static InlineKeyboardMarkup Get_Pagniate_Cancel_Menu_KeyBoards()
+        {
+            if (Pagniate_Cancel_Menu_KeyBoards is null)
+            {
+                Pagniate_Cancel_Menu_KeyBoards = new(new[]
+                {
+  
+                   new []
+                 {
+                        InlineKeyboardButton.WithCallbackData(text: "دیدن لیست بعدی کاربران", callbackData: BotNameHelper.Paginate_See_Next_Page),
+                        InlineKeyboardButton.WithCallbackData(text: "لغو و بازگشت", callbackData: BotNameHelper.CancelAction),
+                },
+   
+                   new []
+                {
+                        InlineKeyboardButton.WithCallbackData(text: "منو اصلی", callbackData: BotNameHelper.Menu),
+                     
+                },
+       
+                });
+            }
+
+
+            return Pagniate_Cancel_Menu_KeyBoards;
+        }
+        public static InlineKeyboardMarkup GetUserPaginationMenuKeyBorad()
+        {
+            if (UserPaginationMenuKeyBorad is null)
+            {
+                UserPaginationMenuKeyBorad = new(new[]
+                {
+    // first row
+                   new []
+                 {
+                        InlineKeyboardButton.WithCallbackData(text: "10", callbackData: BotNameHelper.Pagnination_Number10),
+                        InlineKeyboardButton.WithCallbackData(text: "20", callbackData: BotNameHelper.Pagnination_Number20),
+                },
+      // second row
+                   new []
+                {
+                        InlineKeyboardButton.WithCallbackData(text: "50", callbackData: BotNameHelper.Pagnination_Number50),
+                        InlineKeyboardButton.WithCallbackData(text: "100", callbackData: BotNameHelper.Pagnination_Number100),
+                },
+                   new []
+                {
+                        InlineKeyboardButton.WithCallbackData(text: "200", callbackData: BotNameHelper.Pagnination_Number200),
+                        InlineKeyboardButton.WithCallbackData(text: "400", callbackData: BotNameHelper.Pagnination_Number400),
+                },
+                   new []
+               {
+                        InlineKeyboardButton.WithCallbackData(text: "800", callbackData: BotNameHelper.Pagnination_Number800),
+                        InlineKeyboardButton.WithCallbackData(text: "تمامی کاربران", callbackData: BotNameHelper.Pagination_AllNumber),
+               },
+                });
+               }
+           
+
+            return UserPaginationMenuKeyBorad;
+        }
+        public static ReplyKeyboardMarkup GetMenuKeyBoardsKey()
+        {
+            if (GetMenuKeyBoards is null)
+            {
+                GetMenuKeyBoards = new(new[]
+                    {
+                        new KeyboardButton[]{ "برگشت به منو"},
+                    })
+                { ResizeKeyboard = true };
+            }
+
+            return GetMenuKeyBoards;
+        }
+        public static ReplyKeyboardMarkup GetAcceptCancelKeyBoardBoard()
+        {
+            if (AcceptCancelKeyBoard is null)
+            {
+                AcceptCancelKeyBoard = new(new[]
+                    {
+                        new KeyboardButton[]{ BotNameHelper.CancelAction,BotNameHelper.AcceptSendMessage},
+                    })
+                { ResizeKeyboard = true };
+            }
+
+            return AcceptCancelKeyBoard;
+        }
+        public static ReplyKeyboardMarkup GetMenuCancelKeyBoard()
+        {
+            if (MenuCancelKeyBoard is null)
+            {
+                MenuCancelKeyBoard = new(new[]
+                    {
+                        new KeyboardButton[]{ BotNameHelper.CancelAction,BotNameHelper.SeeMenu},
+                    })
+                { ResizeKeyboard = true };
+            }
+
+            return MenuCancelKeyBoard;
+        }
+        public static ReplyKeyboardMarkup GetAdminLawKeyBoard()
+        {
+            if (AdminLawKeyBoard is null)
+            {
+                AdminLawKeyBoard = new(new[]
+                    {
+                        new KeyboardButton[]{ BotNameHelper.AdminPanel_SetLaws,BotNameHelper.AdminPanel_AddNewLaw},
+                    })
+                { ResizeKeyboard = true };
+            }
+
+            return AdminLawKeyBoard;
+        }
+
+
+        public static ReplyKeyboardMarkup GetAdminPanelKeyBoard()
+        {
+            if (AdminPanelKeyboard is null)
+            {
+                AdminPanelKeyboard = new(new[]
+                    {
+                        new KeyboardButton[]{ BotNameHelper.AdminPanel_SeeUsers,BotNameHelper.AdminPanel_SendMessageToAllUser},
+                        new KeyboardButton[]{ BotNameHelper.AdminPanel_StopBot,BotNameHelper.AdminPanel_SetLaws},
+                        new KeyboardButton[]{ BotNameHelper.AdminPanel_StopSell,BotNameHelper.AdminPanel_StartSell},
+                        new KeyboardButton[]{ BotNameHelper.AdminPanel_BanUser,BotNameHelper.AdminPanel_UnBanUser},
+                        new KeyboardButton[]{ BotNameHelper.AdminMenu},
+                    })
+                { ResizeKeyboard = true };
+            }
+
+            return AdminPanelKeyboard;
+        }
+
         public static ReplyKeyboardMarkup GetCardsMenuKeyBoard()
         {
             if (CardsMenuKeyBoards is null)
@@ -176,7 +342,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
                 { ResizeKeyboard = true };
             }
 
-            return AdminActiveSellingMainMarkup;
+            return AdminActiveSellingMainMarkup;  
         }
         public static ReplyKeyboardMarkup GetContactKeyboard()
         {

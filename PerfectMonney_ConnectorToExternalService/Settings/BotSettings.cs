@@ -22,7 +22,6 @@ namespace PefectMoney.Core.Settings
         [NotMapped]
         public string RuleTextAsOneString { get => _ruleTextAsOneString??= MakeListRuleTextToSingleText(); }
         public string AboutUs { get; set; }
-        public bool StopBot { get; set; } = false;
         private string _ruleTextAsOneString;
         private string MakeListRuleTextToSingleText()
         {

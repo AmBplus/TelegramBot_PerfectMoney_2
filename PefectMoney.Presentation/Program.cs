@@ -5,6 +5,8 @@ using PefectMoney.Infrastructure;
 using Microsoft.Extensions.Options;
 using static PefectMoney.Infrastructure.Bootstrap;
 using PefectMoney.Core.Settings;
+using Microsoft.Extensions.Configuration;
+using Telegram.Bot.Types;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,14 @@ var botConfigurationSection = builder.Configuration.GetSection(BotConfiguration.
 
 
 builder.Services.Configure<BotConfiguration>(botConfigurationSection);
+if(builder.Environment.EnvironmentName == Environments.Development)
+{
+    builder.Services.ConfigureWritable<BotSettings>(builder.Configuration.GetSection(BotSettings.Configuration),file:$"appsettings.{Environments.Development}.json");
+}
+else
+{
+    builder.Services.ConfigureWritable<BotSettings>(builder.Configuration.GetSection(BotSettings.Configuration));
+}
 
 
 var botConfiguration = botConfigurationSection.Get<BotConfiguration>();
