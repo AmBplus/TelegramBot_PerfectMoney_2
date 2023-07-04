@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PefectMoney.Shared.Utility;
+using PerfectMonney_ConnectorToExternalService.UseCase.FinotechVerifyBankCard;
 
-namespace PefectMoney.Core.UseCase.VerifyCard
+namespace PerfectMonney_ConnectorToExternalService.UseCase.FinotechVerifyBankCard
 {
     public class FinnotechVerifyCardStatus : Enumeration<int, string>
     {

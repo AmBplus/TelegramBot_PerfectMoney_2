@@ -2,9 +2,9 @@
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Hosting;
-using PefectMoney.Core.Settings;
+using PerfectMonney_ConnectorToExternalService.Settings;
 
-namespace PefectMoney.Presentation.Services
+namespace PerfectMonney_ConnectorToExternalService.Services
 {
 
     public class WritableOptions<T> : IWritableOptions<T> where T : class, new()
@@ -40,7 +40,7 @@ namespace PefectMoney.Presentation.Services
 
             var jObject = JsonConvert.DeserializeObject<JObject>(File.ReadAllText(physicalPath));
             var sectionObject = jObject.TryGetValue(_section, out JToken section) ?
-                JsonConvert.DeserializeObject<T>(section.ToString()) : (Value ?? new T());
+                JsonConvert.DeserializeObject<T>(section.ToString()) : Value ?? new T();
 
             applyChanges(sectionObject);
 
@@ -60,7 +60,7 @@ namespace PefectMoney.Presentation.Services
             services.AddTransient<IWritableOptions<T>>(provider =>
             {
                 var configuration = (IConfigurationRoot)provider.GetService<IConfiguration>();
-                var environment = provider.GetService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+                var environment = provider.GetService<IWebHostEnvironment>();
                 var options = provider.GetService<IOptionsMonitor<T>>();
                 return new WritableOptions<T>(environment, options, configuration, section.Key, file);
             });

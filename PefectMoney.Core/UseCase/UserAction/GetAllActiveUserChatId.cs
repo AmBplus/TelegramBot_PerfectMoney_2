@@ -32,6 +32,7 @@ namespace PefectMoney.Core.UseCase.UserAction
                 var result = await Context.Users.Where(x => x.Active).Select(x => new UserDto
                 {
                     BotChatId = x.BotChatId,
+                    IsActive = x.Active
                 }).ToListAsync(cancellationToken);
                 return result.ToSuccessResult();
             }

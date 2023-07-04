@@ -1,13 +1,9 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Options;
-using PefectMoney.Core.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PefectMoney.Core.UseCase._BotSettings
+using PerfectMonney_ConnectorToExternalService.Settings;
+
+namespace PerfectMonney_ConnectorToExternalService.UseCase._BotSettings
 {
     public class GetBotSettingsRequest : IRequest<BotSettings>
     {

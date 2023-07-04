@@ -18,11 +18,12 @@ using PefectMoney.Core.UseCase.UserAction;
 using PefectMoney.Core.UseCase._BotSettings;
 using PefectMoney.Core.Extensions;
 using System.Text;
-using PefectMoney.Core.UseCase.VerifyCard;
 using PefectMoney.Presentation.PresentationHelper.Validator;
 using Microsoft.Extensions.Options;
-using PefectMoney.Core.Settings;
 using Microsoft.Extensions.Configuration;
+using PefectMoney.Core.Settings;
+using PefectMoney.Core.UseCase.VerifyCard;
+using FluentValidation;
 
 namespace PefectMoney.Presentation.Services;
 
@@ -82,10 +83,28 @@ public class UpdateHandlers
         {
             id = update.CallbackQuery.Message.Chat.Id;
         }
-        
+        else
+        {
+            await _botClient.SendTextMessageAsync(chatId: id, text: "نوع درخواست ارسالی تعریف نشده");
+            return;
+        }
          patientMessage = await _botClient.SendTextMessageAsync(id, "درخواست شما در حال بررسی است لطفا شکیبا باشید");
-       
+        var BotSettings = await MediatR.Send(new GetBotSettingsRequest());
+        if(BotSettings.StopBot)
+        {
+            var user = await MediatR.Send(new GetUserByBotUserIdQueryRequest(id));
+            if(user == null ||  user.Roles.Id != RoleName.Admin)
+            {
+               await RemoveAllPermantActions(id);
+               await _botClient.SendTextMessageAsync(chatId: id, text: BotNameHelper.AdminPanel_StopBot);
+                await _botClient.DeleteMessageAsync(id, messageId: patientMessage.MessageId, cancellationToken);
+                return;
+            }
 
+            await HandleStatusStopBotRequest(update,user,cancellationToken);
+            await _botClient.DeleteMessageAsync(id, messageId: patientMessage.MessageId, cancellationToken);
+            return;
+        }
         
 
         var handler = update switch
@@ -99,6 +118,23 @@ public class UpdateHandlers
         await handler;
         await _botClient.DeleteMessageAsync(id, messageId: patientMessage.MessageId, cancellationToken);
     }
+
+    private async Task HandleStatusStopBotRequest(Update update, UserDto user, CancellationToken cancellationToken)
+    {
+        if(update.CallbackQuery == null)
+        {
+            AddActionToActionHelper(update.Message!.Chat.Id,new BotAction() { ActionName = BotNameHelper.AdminPanel_StartBot});
+            var textMessage = CreateString("در حال حاظر ربات در دست تعمیر است", "اگر قصد خارج کردن از این وضعیت را دارید", "تایید:شروع دوباره ربات", "کنسل:در همین وضعیت بماند");
+            await _botClient.SendTextMessageAsync(chatId: update.Message!.Chat.Id, text: textMessage,replyMarkup:CreateKeyboardHelper.Get_Accept_UnAccept_Menu_MenuKeyBoard());
+            return;
+        }
+        if (update.CallbackQuery.Data != BotNameHelper.AcceptAction) {
+            await RemoveAllPermantActions(update.CallbackQuery.Message.Chat.Id);
+            return;
+        }
+        await StartBot(update.CallbackQuery.Message.Chat.Id);
+    }
+
     private async Task BotOnCallBackReceived(CallbackQuery callback, CancellationToken cancellationToken)
     {
       
@@ -114,6 +150,12 @@ public class UpdateHandlers
             if (result == null) return;
             user = result;
         }
+        if(!user.IsActive)
+        {
+           await _botClient.SendTextMessageAsync(chatId: callback.Message.Chat.Id, text: "دسترسی شما این بات گرفته شده و اجازه دسترسی ندارید");
+            return;
+        }
+        
         if (callback.Data is not { } callbackData)
             return;
         if (BotSettings.StopSelling && user.Roles.Id  != RoleName.Admin)
@@ -163,13 +205,76 @@ public class UpdateHandlers
             {
                 BotNameHelper.AdminPanel_StopBot => StopBot(callback.Message.Chat.Id),
                 BotNameHelper.AdminPanel_StartBot => StartBot(callback.Message.Chat.Id),
+                BotNameHelper.AdminPanel_BanUser => DoBanUserBot(botAction,callback,cancellationToken),
+                BotNameHelper.AdminPanel_UnBanUser => DoUnBanUserBot(botAction, callback, cancellationToken),
+                BotNameHelper.AdminPanel_SetLaws => DoSetLaws(botAction, callback, cancellationToken),
                 _ => RemoveAllPermantActions(callback.Message.Chat.Id)
             }; ;
             await action;
         }
+        
+        
         return;
     
     }
+
+    private async Task DoSetLaws(BotAction botAction, CallbackQuery callback, CancellationToken cancellationToken)
+    {
+       var result = await MediatR.Send(new SetLawCommandRequest(botAction.Message));
+        await RemoveAllPermantActions(callback.Message.Chat.Id);  
+        await _botClient.SendTextMessageAsync(chatId: callback.Message.Chat.Id, text: "قوانین تغیر پیدا کرد", replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
+    }
+
+    private async Task DoUnBanUserBot(BotAction botAction, CallbackQuery callback, CancellationToken cancellationToken)
+    {
+        long botId = 0;
+        try
+        {
+            botId = Convert.ToInt64(botAction.Message);
+        }
+        catch (Exception)
+        {
+            await RemoveAllPermantActions(callback!.Message!.Chat.Id);
+            await _botClient.SendTextMessageAsync(chatId: callback.Message.Chat.Id, text: "مشکلی در فرمت آیدی کاربر پیش آمده", replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
+            return;
+        }
+
+        var result = await MediatR.Send(new ChangeUserStatusCommandRequest(botId, true));
+        if (!result.IsSuccess)
+        {
+            await RemoveAllPermantActions(callback!.Message!.Chat.Id);
+            await _botClient.SendTextMessageAsync(chatId: callback.Message.Chat.Id, text: "مشکلی در تغیر وضعیت کاربر پیش آمده", replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
+            return;
+        }
+        await RemoveAllPermantActions(callback!.Message!.Chat.Id);
+        await _botClient.SendTextMessageAsync(chatId: callback.Message.Chat.Id, text: "کاربر در صورت وجود unban شد", replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
+    }
+
+    private async Task DoBanUserBot(BotAction botAction,CallbackQuery callback, CancellationToken cancellationToken)
+    {
+        long botId = 0;
+        try
+        {
+             botId = Convert.ToInt64(botAction.Message);
+        }
+        catch (Exception)
+        {
+           await RemoveAllPermantActions(callback!.Message!.Chat.Id);
+           await _botClient.SendTextMessageAsync(chatId: callback.Message.Chat.Id, text: "مشکلی در فرمت آیدی کاربر پیش آمده", replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
+            return;
+        }
+
+       var result = await MediatR.Send(new ChangeUserStatusCommandRequest(botId, false));
+        if(!result.IsSuccess)
+        {
+            await RemoveAllPermantActions(callback!.Message!.Chat.Id);
+            await _botClient.SendTextMessageAsync(chatId: callback.Message.Chat.Id, text: "مشکلی در تغیر وضعیت کاربر پیش آمده", replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
+            return;
+        }
+        await RemoveAllPermantActions(callback!.Message!.Chat.Id);
+        await _botClient.SendTextMessageAsync(chatId: callback.Message.Chat.Id, text: "کاربر در صورت وجود بن شد", replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
+    }
+
     private async Task StopBot(long chatId)
     {
         string msg = "";
@@ -382,6 +487,11 @@ public class UpdateHandlers
         }
         if (message.Text is not { } messageText)
             return;
+        if (!user.IsActive)
+        {
+            await _botClient.SendTextMessageAsync(chatId: message.Chat.Id, text: "دسترسی شما این بات گرفته شده و اجازه دسترسی ندارید");
+            return;
+        }
         ActionHelper.BotActions.TryGetValue(message.Chat.Id, out BotAction botAction);
         // Handle BotActions
         if(botAction != null)
@@ -423,7 +533,7 @@ public class UpdateHandlers
                 BotNameHelper.AdminPanel_SendMessageToAllUser => AdminPanel_SendMessageToAllUser(_botClient, message, cancellationToken),
                 BotNameHelper.AdminPanel_StartSell => AdminPanel_StartSell(_botClient, message, cancellationToken),
                 BotNameHelper.AdminPanel_StopSell => AdminPanel_StopSell(_botClient, message, cancellationToken),
-                BotNameHelper.AdminPanel_StopBot => AdminPanel_StartBot(_botClient, message, cancellationToken),
+                BotNameHelper.AdminPanel_StopBot => AdminPanel_StopBot(_botClient, message, cancellationToken),
                 BotNameHelper.AdminPanel_SeeUsers => AdminPanel_SeeUsers(_botClient,user, message, cancellationToken),
                 _ => AdminMenu(_botClient, message, cancellationToken)
             };
@@ -450,8 +560,6 @@ public class UpdateHandlers
             Message sentMessage = await action;
             _logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
         }
-    
-
         static async Task<Message> UserMenu(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
         {
             return await botClient.SendTextMessageAsync(
@@ -474,7 +582,6 @@ public class UpdateHandlers
                 );
                 
         }
-
         AddActionToActionHelper(chatId: message.Chat.Id, new BotAction() { ActionName = BotNameHelper.Pagnination });
         return await botClient.SendTextMessageAsync(
               chatId: message.Chat.Id,
@@ -482,11 +589,7 @@ public class UpdateHandlers
               replyMarkup: CreateKeyboardHelper.GetUserPaginationMenuKeyBorad(),
               cancellationToken: cancellationToken
                );
-
-
-
     }
-
     private async Task<Message> AdminPanel_StopBot(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
 
@@ -511,10 +614,6 @@ public class UpdateHandlers
 
 
     }
-
-
-
-
     private async Task<Message> AdminPanel_StartBot(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
 
@@ -539,8 +638,6 @@ public class UpdateHandlers
 
 
     }
-
-
     private async Task<Message> AdminPanel_StopSell(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
         if (BotSettings.StopSelling)
@@ -561,7 +658,6 @@ public class UpdateHandlers
              );
 
     }
-
     private async Task<Message> AdminPanel_StartSell(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
 
@@ -585,7 +681,6 @@ public class UpdateHandlers
      
 
     }
-
     private async Task<Message> AdminPanel_SendMessageToAllUser(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
 
@@ -596,7 +691,6 @@ public class UpdateHandlers
                replyMarkup: CreateKeyboardHelper.GetMenuCancelKeyBoard(),
                cancellationToken: cancellationToken);
     }
-
     private async Task<Message> AdminPanel_SetLaws(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
         
@@ -604,7 +698,7 @@ public class UpdateHandlers
         
         return await botClient.SendTextMessageAsync(
           chatId: message.Chat.Id,
-          text: "قوانین خود را وارد نمایید ، دقت کنید که قانون های قبلی پاک خواهند شد\n",
+          text: "قوانین خود را وارد نمایید ، دقت کنید که قانون های قبلی پاک خواهند شد",
           replyMarkup: CreateKeyboardHelper.GetMenuCancelKeyBoard(),
           cancellationToken: cancellationToken);
     }
@@ -618,14 +712,24 @@ public class UpdateHandlers
     }
     private async Task<Message> AdminPanel_UnBanUser(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-    }
+        AddActionToActionHelper(message.Chat.Id, new BotAction { ActionName = BotNameHelper.AdminPanel_UnBanUser });
 
+        return await botClient.SendTextMessageAsync(
+          chatId: message.Chat.Id,
+          text: "آیدی کاربری که قصد unban کردن آن را دارید را وارید نمایید.",
+          replyMarkup: CreateKeyboardHelper.GetMenuCancelKeyBoard(),
+          cancellationToken: cancellationToken);
+    }
     private async Task<Message> AdminPanel_BanUser(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-    }
+        AddActionToActionHelper(message.Chat.Id, new BotAction { ActionName = BotNameHelper.AdminPanel_BanUser});
 
+        return await botClient.SendTextMessageAsync(
+          chatId: message.Chat.Id,
+          text: "آیدی کاربری که قصد بن کردن آن را دارید را وارد نماید.",
+          replyMarkup: CreateKeyboardHelper.GetMenuCancelKeyBoard(),
+          cancellationToken: cancellationToken);
+    }
     private async Task<Message> AdminPanel(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
         return await botClient.SendTextMessageAsync(
@@ -634,7 +738,6 @@ public class UpdateHandlers
             replyMarkup: CreateKeyboardHelper.GetAdminPanelKeyBoard(),
             cancellationToken: cancellationToken);
     }
-
     private async Task HandleActions(ITelegramBotClient botClient, Message message,BotAction botAction,UserDto userDto, CancellationToken cancellationToken)
     {
      
@@ -664,16 +767,90 @@ public class UpdateHandlers
                         await SendMessageToAllUser(botClient, botAction, message, cancellationToken);
                         return;
                     }
-                case BotNameHelper.AddNewCard:
+                case BotNameHelper.AdminPanel_SetLaws:
                     {
-                        await AddNewCard(botClient, botAction, message, cancellationToken);
+                        await SetLaws(botClient, botAction, message, cancellationToken);
                         return;
                     }
-
+                case BotNameHelper.AdminPanel_BanUser:
+                    {
+                        await BanUser(botClient, botAction, message, cancellationToken);
+                        return;
+                    }
+                case BotNameHelper.AdminPanel_UnBanUser:
+                    {
+                        await UnBanUser(botClient, botAction, message, cancellationToken);
+                        return;
+                    }
                 default: break;
             }
         }
 
+    }
+
+    private async Task UnBanUser(ITelegramBotClient botClient, BotAction botAction, Message message, CancellationToken cancellationToken)
+    {
+        // Validate UserCard 
+        var botChatId = NumberConverter.ConvertToEnglishNumbers(message.Text?.Trim());
+        // Code 
+        BotChatIdValidator botIdValidator = new BotChatIdValidator();
+        var validateResult = await botIdValidator.ValidateAsync(new BotChatIdDto(botChatId) {  });
+        if (!validateResult.IsValid)
+        {
+           
+             await botClient.SendTextMessageAsync(
+               chatId: message.Chat.Id,
+               text: validateResult.Errors.ToStringErrors(),
+               replyMarkup: CreateKeyboardHelper.GetMenuCancelKeyBoard(),
+               cancellationToken: cancellationToken);
+            return;
+        }
+ 
+        botAction.Message = message.Text.Trim();
+        var txt = CreateString("آیدی زیر آیدی کاربریست توسط شما دریافت گردید", message.Text.Trim(), "در صورت تایید از منو زیر تایید را انتخاب کنید");
+        await _botClient.SendTextMessageAsync(chatId: message.Chat.Id, txt, replyMarkup: CreateKeyboardHelper.GetAcceptCancelKeyBoardBoard());
+    }
+
+    private async Task BanUser(ITelegramBotClient botClient, BotAction botAction, Message message, CancellationToken cancellationToken)
+    {
+        // Validate UserCard 
+        var botChatId = NumberConverter.ConvertToEnglishNumbers(message.Text?.Trim());
+        // Code 
+        BotChatIdValidator botIdValidator = new BotChatIdValidator();
+        var validateResult = await botIdValidator.ValidateAsync(new BotChatIdDto(botChatId) { });
+        if (!validateResult.IsValid)
+        {
+
+            await botClient.SendTextMessageAsync(
+              chatId: message.Chat.Id,
+              text: validateResult.Errors.ToStringErrors(),
+              replyMarkup: CreateKeyboardHelper.GetMenuCancelKeyBoard(),
+              cancellationToken: cancellationToken);
+            return;
+        }
+
+        botAction.Message = message.Text.Trim();
+        var txt = CreateString("آیدی زیر آیدی کاربریست توسط شما دریافت گردید", message.Text.Trim(), "در صورت تایید از منو زیر تایید را انتخاب کنید");
+        await _botClient.SendTextMessageAsync(chatId: message.Chat.Id, txt, replyMarkup: CreateKeyboardHelper.GetAcceptCancelKeyBoardBoard());
+    }
+
+    private async Task SetLaws(ITelegramBotClient botClient, BotAction botAction, Message message, CancellationToken cancellationToken)
+    {
+       
+        if (string.IsNullOrWhiteSpace(message.Text))
+        {
+
+            await botClient.SendTextMessageAsync(
+              chatId: message.Chat.Id,
+              text: "پیام وارد شده از سوی شما فرمت نا معتبر دارد دوباره تلاش فرمایید.",
+              replyMarkup: CreateKeyboardHelper.GetMenuCancelKeyBoard(),
+              cancellationToken: cancellationToken);
+            return;
+        }
+
+        botAction.Message = message.Text.Trim();
+        var txt =CreateString("متن زیر توسط شما دریافت گردید", botAction.Message, "در صورت تایید از منو زیر تایید را انتخاب کنید");
+        await _botClient.SendTextMessageAsync(chatId: message.Chat.Id, txt, replyMarkup: CreateKeyboardHelper.GetAcceptCancelKeyBoardBoard());
     }
 
     private async Task SendMessageToAllUser(ITelegramBotClient botClient, BotAction botAction, Message message, CancellationToken cancellationToken)
@@ -713,7 +890,6 @@ public class UpdateHandlers
         await botClient.SendMessageToAll(users: resultUsers.Data, sendMessage, cancellationToken);
         return;
     }
-
     private async Task<Message> SeeRegisteredCards(ITelegramBotClient botClient,BotAction botAction, Message message, CancellationToken cancellationToken)
     {
         if(botAction.ActionName != BotNameHelper.SeeRegisteredCards) { return message; }
@@ -798,8 +974,6 @@ public class UpdateHandlers
         if (botAction.ActionName != BotNameHelper.AddNewCard ) return message;
 
         // Validate UserCard 
-
-        
         var cardNumber = NumberConverter.ConvertToEnglishNumbers(message.Text?.Trim());
         // Code 
         CardNumberValidator cardNumberValidator = new CardNumberValidator();
@@ -870,7 +1044,6 @@ public class UpdateHandlers
                cancellationToken: cancellationToken);
 
     }
-
     private async Task<Message> AdminMenu(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
         return await botClient.SendTextMessageAsync(
@@ -879,7 +1052,6 @@ public class UpdateHandlers
             replyMarkup: CreateKeyboardHelper.GetAdminMenuKeyboard(),
             cancellationToken: cancellationToken);
     }
-
     private async Task<Message> Cards(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
         return await botClient.SendTextMessageAsync(
@@ -888,7 +1060,6 @@ public class UpdateHandlers
                  replyMarkup: CreateKeyboardHelper.GetCardsMenuKeyBoard(),
                  cancellationToken: cancellationToken);
     }
-
     private async Task<Message> BuyingProduct(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
         return await botClient.SendTextMessageAsync(
@@ -897,7 +1068,6 @@ public class UpdateHandlers
           replyMarkup: new ReplyKeyboardRemove(),
           cancellationToken: cancellationToken);
     }
-
     private async Task<Message> AboutUs(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
         var settings = await MediatR.Send(new GetBotSettingsRequest(), cancellationToken);
@@ -907,7 +1077,6 @@ public class UpdateHandlers
            replyMarkup: CreateKeyboardHelper.GetUserMenuKeyBoard(),
            cancellationToken: cancellationToken);
     }
-
     private  async Task<Message> ShowLaws(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
     {
         var settings = await MediatR.Send(new GetBotSettingsRequest(), cancellationToken);
@@ -917,9 +1086,6 @@ public class UpdateHandlers
            replyMarkup: CreateKeyboardHelper.GetUserMenuKeyBoard(),
            cancellationToken: cancellationToken);
     }
-
- 
-
     private async Task<UserDto> CreateUser(Message message,CancellationToken cancellationToken)
     {
         var number = message.Contact?.PhoneNumber;
@@ -975,13 +1141,6 @@ public class UpdateHandlers
         message.Text = BotNameHelper.Menu;
         return newUser;
     }
-
-  
-
-
-
-#pragma warning disable IDE0060 // Remove unused parameter
-#pragma warning disable RCS1163 // Unused parameter.
     private Task UnknownUpdateHandlerAsync(Telegram.Bot.Types.Update update, CancellationToken cancellationToken)
 #pragma warning restore RCS1163 // Unused parameter.
 #pragma warning restore IDE0060 // Remove unused parameter
@@ -989,4 +1148,6 @@ public class UpdateHandlers
         _logger.LogInformation("Unknown update type: {UpdateType}", update.Type);
         return Task.CompletedTask;
     }
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable RCS1163 // Unused parameter.
 }

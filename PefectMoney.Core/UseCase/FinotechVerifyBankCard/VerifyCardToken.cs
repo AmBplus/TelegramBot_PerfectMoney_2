@@ -4,10 +4,10 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using PefectMoney.Shared.Helper;
 using Microsoft.Extensions.Options;
-using PefectMoney.Core.Settings;
 using System.Security.Cryptography;
 using static System.Formats.Asn1.AsnWriter;
 using Microsoft.Extensions.Logging;
+using PefectMoney.Core.Settings;
 
 namespace PefectMoney.Core.UseCase.VerifyCard
 {

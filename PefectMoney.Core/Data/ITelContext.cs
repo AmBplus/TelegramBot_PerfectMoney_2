@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using PefectMoney.Core.Model;
-using PefectMoney.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;

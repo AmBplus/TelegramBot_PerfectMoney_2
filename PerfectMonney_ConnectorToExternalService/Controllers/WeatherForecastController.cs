@@ -1,4 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using PerfectMonney_ConnectorToExternalService.Settings;
 
 namespace PerfectMonney_ConnectorToExternalService.Controllers
 {
@@ -13,14 +15,18 @@ namespace PerfectMonney_ConnectorToExternalService.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger,IOptions<BotSettings> options)
         {
             _logger = logger;
+            Options = options;
         }
 
+        public IOptions<BotSettings> Options { get; }
+
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public IEnumerable<WeatherForecast> Get([FromServices] IWritableOptions<BotSettings> writableOptions)
         {
+            writableOptions.Update(x => x.AboutUs = "ب9321325ب");
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),

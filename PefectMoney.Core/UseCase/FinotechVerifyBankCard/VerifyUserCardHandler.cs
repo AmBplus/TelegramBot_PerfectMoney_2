@@ -6,9 +6,9 @@ using System.Text.Json.Serialization;
 using PefectMoney.Shared.Utility.ResultUtil;
 using PefectMoney.Shared.Utility;
 using Microsoft.Extensions.Options;
-using PefectMoney.Core.Settings;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using PefectMoney.Core.Settings;
 
 namespace PefectMoney.Core.UseCase.VerifyCard
 {

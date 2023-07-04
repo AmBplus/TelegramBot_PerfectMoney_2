@@ -6,11 +6,10 @@ using System.Text.Json.Serialization;
 using PefectMoney.Shared.Utility.ResultUtil;
 using PefectMoney.Shared.Utility;
 using Microsoft.Extensions.Options;
-using PefectMoney.Core.Settings;
 using MediatR;
-using Microsoft.Extensions.Logging;
+using PerfectMonney_ConnectorToExternalService.Settings;
 
-namespace PefectMoney.Core.UseCase.VerifyCard
+namespace PerfectMonney_ConnectorToExternalService.UseCase.FinotechVerifyBankCard
 {
     public interface IVerifyUserCard
     {

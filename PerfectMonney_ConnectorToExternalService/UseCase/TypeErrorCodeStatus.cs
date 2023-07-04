@@ -1,4 +1,4 @@
-﻿namespace PefectMoney.Core.UseCase
+﻿namespace PerfectMonney_ConnectorToExternalService.UseCase
 {
     public enum TypeErrorCodeStatus : int
     {

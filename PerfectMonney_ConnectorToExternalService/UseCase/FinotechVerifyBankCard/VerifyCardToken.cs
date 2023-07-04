@@ -1,15 +1,14 @@
 ﻿
 using RestSharp;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Configuration;
+
 using PefectMoney.Shared.Helper;
 using Microsoft.Extensions.Options;
-using PefectMoney.Core.Settings;
-using System.Security.Cryptography;
-using static System.Formats.Asn1.AsnWriter;
-using Microsoft.Extensions.Logging;
 
-namespace PefectMoney.Core.UseCase.VerifyCard
+
+using PerfectMonney_ConnectorToExternalService.Settings;
+
+namespace PerfectMonney_ConnectorToExternalService.UseCase.FinotechVerifyBankCard
 {
     public class VerifyCardToken : IVerifyCardToken
     {

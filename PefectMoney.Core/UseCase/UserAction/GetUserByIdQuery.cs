@@ -49,7 +49,8 @@ namespace PefectMoney.Core.UseCase.UserAction
                     {
                         Id = x.Roles!.Id,
                         Name = x.Roles!.Name,
-                    }
+                    },
+                    IsActive = x.Active
                 }).FirstOrDefaultAsync(cancellationToken);
                 return result;
             }

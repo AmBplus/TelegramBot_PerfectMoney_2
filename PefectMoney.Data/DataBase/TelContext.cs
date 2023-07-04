@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PefectMoney.Core.Data;
 using PefectMoney.Core.Model;
-using PefectMoney.Core.Settings;
 using PefectMoney.Data.Mapping;
 
 namespace PefectMoney.Data.DataBase

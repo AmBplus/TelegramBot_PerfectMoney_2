@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -15,12 +13,12 @@ namespace PefectMoney.Core.Settings
 #pragma warning restore RCS1110 // Declare type inside namespace.
 #pragma warning restore CA1050 // Declare types in namespaces
         public static readonly string Configuration = "BotSettings";
-        
+         
         public bool StopSelling { get; set; } = false;
         // public bool Repair { get; set; }
         public List<string> RuleText { get; set; }
         [NotMapped]
-        public string RuleTextAsOneString { get => _ruleTextAsOneString??= MakeListRuleTextToSingleText(); }
+        public string RuleTextAsOneString { get => _ruleTextAsOneString ??= MakeListRuleTextToSingleText(); }
         public string AboutUs { get; set; }
         public bool StopBot { get; set; } = false;
         private string _ruleTextAsOneString;
