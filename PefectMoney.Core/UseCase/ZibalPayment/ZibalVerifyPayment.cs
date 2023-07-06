@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using PefectMoney.Core.Data;
+using PefectMoney.Core.Extensions;
 using PefectMoney.Core.Model;
 using PefectMoney.Core.Settings;
 using PefectMoney.Core.UseCase.Notify;
@@ -83,8 +84,14 @@ namespace PefectMoney.Core.UseCase.ZibalPayment
                         TotalRialsPrice = orderEntity.TotalRialsPrice,
                         trackId = orderEntity.trackId,
                     };
-                       // Rise Event
-                        
+                    // Rise Event
+                    var str = StringExtensionHelper.CreateString($"سفارش با شماره : {orderDto.Id}",
+                        $" به مبلغ ریالی: {orderDto.TotalRialsPrice}",
+                        $"شماره بات آیدی کاربر :{orderDto.BotChatId}"
+                        ,$"تاریخ سفارش :{orderDto.CreationTime}"
+                        ,$"تاریخ پرداخت : {request.paidAt}"
+                        );
+                        await Mediator.Publish(new NotifyAdminRequest(str));
                         return orderDto.ToSuccessResult();
                     }
                     else

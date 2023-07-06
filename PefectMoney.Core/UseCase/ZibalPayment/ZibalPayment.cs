@@ -126,16 +126,19 @@ public class ZiBalPaymentHandler : IRequestHandler<ZibalPaymentRequest, ResultOp
                 var error = ZibalResultResponseCode.FindById<ZibalResultResponseCode>(responseCode);
                 if (error == null)
                 {
-                    throw new Exception("Error Not Find");
-                }
+                await Mediator.Publish(new NotifyAdminRequest($"ZiBalPaymentHandlerResponse -- {responseCode} == {error?.Name} == Error Not Find"));
+                    return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult("مشکلی در برنامه پیش آمده در اصرع وقت مشکل حل خواهد شد  ، شکیبا باشید.");
+            }
 
-                if (error.TypeErrorCodeStatus == TypeErrorCodeStatus.UserError)
+                if (error?.TypeErrorCodeStatus == TypeErrorCodeStatus.UserError)
                 {
-                    return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult(error.Name);
+                await Mediator.Publish(new NotifyAdminRequest($"ZiBalPaymentHandlerResponse -- {responseCode} == {error?.Name} == TypeErrorCodeStatus.UserError"));
+                return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult(error.Name);
                 }
                  await Mediator.Publish(new NotifyAdminRequest($"{error.Name}"));
-                 Logger.LogError(error.Name); // print exception error
-                return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult("مشکلی در برنامه پیش آمده به ادمین اطلاع دهید");
+                 Logger.LogError(error?.Name); // print exception error
+                 await Mediator.Publish(new NotifyAdminRequest($"{error?.Name}"));
+            return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult("مشکلی در برنامه پیش آمده به ادمین اطلاع دهید");
 
             
         }
