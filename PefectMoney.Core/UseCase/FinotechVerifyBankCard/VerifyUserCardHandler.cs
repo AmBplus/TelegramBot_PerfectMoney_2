@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using PefectMoney.Core.Settings;
-using Newtonsoft.Json.Linq;
+using PefectMoney.Core.UseCase.Notify;
 
 namespace PefectMoney.Core.UseCase.VerifyCard
 {
@@ -26,10 +26,12 @@ namespace PefectMoney.Core.UseCase.VerifyCard
     public class VerifyUserCardHandler : IRequestHandler<VerifyUserCardRequestDto, ResultOperation>, IVerifyUserCard
     {
 
-        public VerifyUserCardHandler(IOptions<VerifyBankCardSettings> configuration, IOptions<BotSettings> botsettings, ILogger<VerifyUserCardHandler> logger)
+        public VerifyUserCardHandler(IOptions<VerifyBankCardSettings> configuration, IMediator mediator,
+            IOptions<BotSettings> botsettings, ILogger<VerifyUserCardHandler> logger)
         {
             VerifyAccountSettings = configuration.Value;
             Botsettings = botsettings.Value;
+            Mediator = mediator;
             Logger = logger;
             RestClient = new RestClient(botsettings.Value.ExternalAppBaseUrl);
 
@@ -37,7 +39,7 @@ namespace PefectMoney.Core.UseCase.VerifyCard
         RestClient RestClient { get; set; }
         VerifyBankCardSettings VerifyAccountSettings { get; set; }
         public BotSettings Botsettings { get; }
-
+        public IMediator Mediator { get; }
         public ILogger<VerifyUserCardHandler> Logger { get; }
 
         public async Task<ResultOperation> Handle(VerifyUserCardRequestDto request, CancellationToken cancellationToken)
@@ -69,23 +71,29 @@ namespace PefectMoney.Core.UseCase.VerifyCard
                 {
                     if (matchToVerifyUserCardResponseErrorCode.Status == TypeErrorCodeStatus.UserError)
                     {
+
                         Logger.LogError(matchToVerifyUserCardResponseErrorCode.Name);
+                        await Mediator.Publish(new NotifyAdminRequest($"{matchToVerifyUserCardResponseErrorCode.Name}"));
                         return ResultOperation.ToFailedResult(matchToVerifyUserCardResponseErrorCode.Name);
                     }
                     else if (matchToVerifyUserCardResponseErrorCode.Status == TypeErrorCodeStatus.DestinationSystemError)
                     {
                         Logger.LogError(matchToVerifyUserCardResponseErrorCode.Name);
+                        await Mediator.Publish(new NotifyAdminRequest($"{matchToVerifyUserCardResponseErrorCode.Name}"));
                         return ResultOperation.ToFailedResult("در سیستم احراز هویت مشکلی پیش آمده صبور باشید و بعد امتحان نمایید");
                     }
                     Logger.LogError(matchToVerifyUserCardResponseErrorCode.Name);
+                    await Mediator.Publish(new NotifyAdminRequest($"{matchToVerifyUserCardResponseErrorCode.Name}"));
                     return ResultOperation.ToFailedResult("مشکل سیستمی به وجود آمده به ادمین اطلاع دهید");
                 }
-                Logger.LogError("خطای نامشخصی در بخش وریفای کارت های بانکی پیش آمده");
+                Logger.LogError($"{result.Error}--{result.Status}{result.ResponseCode}");
+                await Mediator.Publish(new NotifyAdminRequest($"{result.Error}--{result.Status}{result.ResponseCode}"));
                 return ResultOperation.ToFailedResult("خطای سیستمی به وجود آمده به ادمین اطلاع دهید");
             }
             catch (Exception e)
             {
-                Logger.LogError(e.Message);
+                Logger.LogError(e.Message,e.InnerException?.Message);
+                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation.ToFailedResult("خطای سیستمی به وجود آمده به ادمین اطلاع دهید");
             }
         }
@@ -98,7 +106,8 @@ namespace PefectMoney.Core.UseCase.VerifyCard
             {
                 mobile = phoneNumber,
                 cart = cartNumber,
-                token = bot
+                token = Botsettings.Token,
+                trackId,
             });
 
             return restRequest;

@@ -25,7 +25,8 @@ namespace PefectMoney.Infrastructure
             
             services.Configure<VerifyBankCardSettings>(
              configuration.GetSection(VerifyBankCardSettings.Configuration));
-
+            services.Configure<PerfectMonneySettings>(
+          configuration.GetSection(PerfectMonneySettings.Configuration));
             services.Configure<ZibalPaymentSettings>(
             configuration.GetSection(ZibalPaymentSettings.Configuration));
             services.Configure<BotSettings>(
@@ -40,7 +41,7 @@ namespace PefectMoney.Infrastructure
            .EnableDetailedErrors());
          
 
-            services.AddSingleton<IVerifyCardToken, VerifyCardToken>();
+          
             services.AddTransient<IVerifyUserCard, VerifyUserCardHandler>();
 
             services.AddMediatR(cfg=>cfg.RegisterServicesFromAssemblies(typeof(UserEntity).Assembly));

@@ -17,7 +17,7 @@ namespace PefectMoney.Core.Settings
          
         public string TokenExternalApp { get; set; }
         public string ExternalAppBaseUrl { get; set; }
-        public string ValidBasketTime { get; set; }
+        public int ValidBasketTime { get; set; }
         public bool StopSelling { get; set; } = false;
         // public bool Repair { get; set; }
         public List<string> RuleText { get; set; }

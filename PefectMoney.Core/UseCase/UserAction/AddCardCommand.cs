@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PefectMoney.Core.Data;
 using PefectMoney.Core.Model;
+using PefectMoney.Core.UseCase.Notify;
 using PefectMoney.Shared.Utility.ResultUtil;
 using System;
 using System.Collections.Generic;
@@ -21,13 +22,16 @@ namespace PefectMoney.Core.UseCase.UserAction
     }
     public class AddCardCommandHandler : IRequestHandler<AddCardCommandRequest, ResultOperation>
     {
-        public AddCardCommandHandler(ITelContext context ,ILogger<AddCardCommandHandler> logger)
+        public AddCardCommandHandler(ITelContext context ,IMediator mediator,
+            ILogger<AddCardCommandHandler> logger)
         {
             Context = context;
+            Mediator = mediator;
             Logger = logger;
         }
 
         public ITelContext Context { get; }
+        public IMediator Mediator { get; }
         public ILogger<AddCardCommandHandler> Logger { get; }
 
         public async Task<ResultOperation> Handle(AddCardCommandRequest request, CancellationToken cancellationToken)
@@ -50,6 +54,7 @@ namespace PefectMoney.Core.UseCase.UserAction
             catch (Exception e)
             {
                 Logger.LogError(e.Message);
+                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation.ToFailedResult("خطایی پیش آمده با ادمین تماس حاصل فرمایید");
             }
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using PefectMoney.Shared.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,13 @@ namespace PefectMoney.Core.Model
 {
     public class OrderEntity
     {
+        public OrderEntity()
+        {
+            CreationTime = TimeHelper.DateTimeNow;
+        }
+        public DateTime CreationTime { get; set; }
         public long Id { get; set; }
-        public int trackId { get; set; }
+        public string trackId { get; set; }
         public double TotalDollarPrice { get; set; }
         public double TotalRialsPrice { get; set; }
 

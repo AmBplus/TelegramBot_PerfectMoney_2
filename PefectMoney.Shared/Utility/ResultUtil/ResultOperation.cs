@@ -96,6 +96,15 @@ public class ResultOperation<T>
             Message = new List<string>() { message },
         };
     }
+    public static ResultOperation<T> ToSuccessResult(IEnumerable<string> messages, T data)
+    {
+        return new ResultOperation<T>()
+        {
+            Data = data,
+            IsSuccess = true,
+            Message = messages,
+        };
+    }
     public static ResultOperation<T> ToSuccessResult(List<string> message, T data)
     {
         return new ResultOperation<T>()
@@ -118,6 +127,14 @@ public class ResultOperation<T>
         return new ResultOperation<T>()
         {
             Message = new List<string>() { message },
+            IsSuccess = false,
+        };
+    }
+    public static ResultOperation<T> ToFailedResult(IEnumerable<string> message)
+    {
+        return new ResultOperation<T>()
+        {
+            Message = message,
             IsSuccess = false,
         };
     }

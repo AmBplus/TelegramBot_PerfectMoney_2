@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using PefectMoney.Core.Data;
 using PefectMoney.Core.Extensions;
 using PefectMoney.Core.Model;
+using PefectMoney.Core.UseCase.Notify;
 using PefectMoney.Core.UseCase.UserAction;
 using PefectMoney.Core.UseCase.ZibalPayment;
 using PefectMoney.Shared.Utility.ResultUtil;
@@ -68,6 +69,7 @@ namespace PefectMoney.Core.UseCase._Shop
             catch (Exception e)
             {
                 Logger.LogError(e.Message, e.InnerException?.Message);
+                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation<Uri>.ToFailedResult("خطایی پیش آمده بعدا امتحان کنید");
 
             }
@@ -91,6 +93,7 @@ namespace PefectMoney.Core.UseCase._Shop
             catch (Exception e)
             {
                 Logger.LogError(e.Message, e.InnerException?.Message);
+                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation<Uri>.ToFailedResult( "مشکلی پیش آمده بعدا تلاش کنید");
             }
             return resultGetPaymentLink.Data.Uri.ToSuccessResult();

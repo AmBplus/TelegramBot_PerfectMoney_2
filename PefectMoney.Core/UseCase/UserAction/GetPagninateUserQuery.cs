@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared;
 using System.Security.Cryptography.X509Certificates;
+using PefectMoney.Core.UseCase.Notify;
 
 namespace PefectMoney.Core.UseCase.UserAction
 {
@@ -30,13 +31,16 @@ namespace PefectMoney.Core.UseCase.UserAction
     }
     public class GetPagninateUserQueryHandler : IRequestHandler<GetPagninateUserQueryRequest, ResultOperation<PaginateGetUserQueryResponse>>
     {
-        public GetPagninateUserQueryHandler(ITelContext context ,ILogger<GetUserByBotUserIdQueryHandler> logger )
+        public GetPagninateUserQueryHandler(ITelContext context ,IMediator mediator,
+            ILogger<GetUserByBotUserIdQueryHandler> logger )
         {
             Context = context;
+            Mediator = mediator;
             Logger = logger;
         }
 
         public ITelContext Context { get; }
+        public IMediator Mediator { get; }
         public ILogger<GetUserByBotUserIdQueryHandler> Logger { get; }
 
         public async Task<ResultOperation<PaginateGetUserQueryResponse>> Handle(GetPagninateUserQueryRequest request, CancellationToken cancellationToken)
@@ -97,7 +101,8 @@ namespace PefectMoney.Core.UseCase.UserAction
                 }; 
                 if(listUserDto == null)
                 {
-                    Logger.LogError("تعداد کاربران دریافتی در این تابع نمیتواند نال بشود");
+                    Logger.LogError("تعداد کاربران دریافتی در این تابع نمیتواند نال بشود {GetPagninateUserQueryHandler}");
+                    await Mediator.Publish(new NotifyAdminRequest($"{GetPagninateUserQueryHandler} تعداد کاربران دریافتی در این تابع نمیتواند نال بشود"));
                     return ResultOperation<PaginateGetUserQueryResponse>.ToFailedResult("خطایی پیش آمده");
                 }
                 return response.ToSuccessResult();
@@ -105,6 +110,7 @@ namespace PefectMoney.Core.UseCase.UserAction
             catch (Exception e)
             {
                 Logger.LogError(e.Message, e);
+                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation<PaginateGetUserQueryResponse>.ToFailedResult("تعداد کاربران نمیتواند نال بشود");
             }
 

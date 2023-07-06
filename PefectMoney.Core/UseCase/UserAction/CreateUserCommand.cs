@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PefectMoney.Core.Data;
 using PefectMoney.Core.Model;
+using PefectMoney.Core.UseCase.Notify;
 using PefectMoney.Shared.Utility.ResultUtil;
 using System;
 using System.Collections.Generic;
@@ -26,11 +27,14 @@ namespace PefectMoney.Core.UseCase.UserAction
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommandRequest, ResultOperation>
     {
         ITelContext Context { get; set; }
+        public IMediator Mediator { get; }
         public ILogger<CreateUserCommandHandler> Logger { get; }
 
-        public CreateUserCommandHandler(ITelContext context,ILogger<CreateUserCommandHandler> logger)
+        public CreateUserCommandHandler(ITelContext context,IMediator mediator,
+            ILogger<CreateUserCommandHandler> logger)
         {
             Context = context;
+            Mediator = mediator;
             Logger = logger;
         }
 
@@ -46,6 +50,7 @@ namespace PefectMoney.Core.UseCase.UserAction
             catch (Exception e)
             {
                 Logger.LogError(e.Message);
+                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation.ToFailedResult();
             }
         }

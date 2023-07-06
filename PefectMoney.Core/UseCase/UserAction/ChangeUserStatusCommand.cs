@@ -2,12 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PefectMoney.Core.Data;
+using PefectMoney.Core.UseCase.Notify;
 using PefectMoney.Shared.Utility.ResultUtil;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace PefectMoney.Core.UseCase.UserAction
 {
@@ -16,13 +13,16 @@ namespace PefectMoney.Core.UseCase.UserAction
     }
     public class ChangeUserStatusCommandHandler : IRequestHandler<ChangeUserStatusCommandRequest, ResultOperation>
     {
-        public ChangeUserStatusCommandHandler(ITelContext Context , ILogger<ChangeUserStatusCommandHandler> logger)
+        public ChangeUserStatusCommandHandler(ITelContext Context,IMediator mediator
+            , ILogger<ChangeUserStatusCommandHandler> logger)
         {
             this.Context = Context;
+            Mediator = mediator;
             Logger = logger;
         }
 
         public ITelContext Context { get; }
+        public IMediator Mediator { get; }
         public ILogger<ChangeUserStatusCommandHandler> Logger { get; }
 
         public async Task<ResultOperation> Handle(ChangeUserStatusCommandRequest request, CancellationToken cancellationToken)
@@ -40,6 +40,7 @@ namespace PefectMoney.Core.UseCase.UserAction
             catch (Exception e)
             {
                 Logger.LogError(e.Message, e);
+                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation.ToFailedResult("خطایی پیش آمده");
             }
         }

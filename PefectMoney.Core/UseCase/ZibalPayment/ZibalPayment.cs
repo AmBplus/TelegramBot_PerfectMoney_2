@@ -14,6 +14,7 @@ using PefectMoney.Shared.Utility;
 using static System.Net.WebRequestMethods;
 using RestSharp;
 using Microsoft.Extensions.Logging;
+using PefectMoney.Core.UseCase.Notify;
 
 namespace PefectMoney.Core.UseCase.ZibalPayment;
 
@@ -68,18 +69,23 @@ public class ZiBalPaymentHandler : IRequestHandler<ZibalPaymentRequest, ResultOp
     RestRequest RestRequest { get; set; }
     RestSharp.RestClient RestClient { get; set; }
 
-    public ZiBalPaymentHandler(IOptions<ZibalPaymentSettings> zibalPaymentSettings,IOptions<BotSettings> options, Logger<ZiBalPaymentHandler> logger)
+    public ZiBalPaymentHandler(IOptions<ZibalPaymentSettings> zibalPaymentSettings,
+        IOptions<BotSettings> options,IMediator mediator,
+        Logger<ZiBalPaymentHandler> logger)
     {
         ZibalPaymentSettings = zibalPaymentSettings.Value;
         BotSettings = options.Value;
+        Mediator = mediator;
         Logger = logger;
     }
     public ZibalPaymentSettings ZibalPaymentSettings { get; set; }
     public BotSettings BotSettings { get; }
+    public IMediator Mediator { get; }
     public Logger<ZiBalPaymentHandler> Logger { get; }
 
     //public string description { get; set; }
-    public async Task<ResultOperation<ZiBalPaymentHandlerResponse>> Handle(ZibalPaymentRequest request, CancellationToken cancellationToken)
+    public async Task<ResultOperation<ZiBalPaymentHandlerResponse>> Handle(ZibalPaymentRequest request
+        , CancellationToken cancellationToken)
     {
         Uri paymentLink;
         try
@@ -127,7 +133,8 @@ public class ZiBalPaymentHandler : IRequestHandler<ZibalPaymentRequest, ResultOp
                 {
                     return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult(error.Name);
                 }
-                Console.WriteLine(error.Name); // print exception error
+                 await Mediator.Publish(new NotifyAdminRequest($"{error.Name}"));
+                 Logger.LogError(error.Name); // print exception error
                 return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult("مشکلی در برنامه پیش آمده به ادمین اطلاع دهید");
 
             
@@ -135,11 +142,13 @@ public class ZiBalPaymentHandler : IRequestHandler<ZibalPaymentRequest, ResultOp
         catch (WebException ex)
         {
             Logger.LogError(ex.Message, ex.InnerException?.Message); // print exception error
+            await Mediator.Publish(new NotifyAdminRequest($"{ex.Message}---{ex.InnerException?.Message}"));
             return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult(ex.Message);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex.Message,ex.InnerException?.Message); // print exception error
+            await Mediator.Publish(new NotifyAdminRequest($"{ex.Message}---{ex.InnerException?.Message}"));
             return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult(ex.Message);
         }
     }

@@ -16,5 +16,25 @@ namespace PefectMoney.Core.Extensions
             sb.Append(enumText.ToString());}
             return sb.ToString();
         }
+        public static string CreateString(params string[] strings)
+        {
+            StringBuilder sb = new StringBuilder(); 
+            foreach (var s in strings)
+            {
+                sb.AppendLine(s);   
+            }
+            return sb.ToString();   
+        }
+
+
+        public static string CreateString(IEnumerable<string> strings)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var s in strings)
+            {
+                sb.AppendLine(s);
+            }
+            return sb.ToString();
+        }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PefectMoney.Core.Data;
 using PefectMoney.Core.Model;
+using PefectMoney.Core.UseCase.Notify;
 using PefectMoney.Shared.Utility.ResultUtil;
 using System;
 using System.Collections.Generic;
@@ -24,11 +25,14 @@ namespace PefectMoney.Core.UseCase.UserAction
     public class GetUserWithPhoneNumberQueryHandler : IRequestHandler<GetUserWithPhoneNumberQueryRequest, ResultOperation<UserDto>>
     {
         ITelContext Context { get; set; }
+        public IMediator Mediator { get; }
         public ILogger<GetUserWithPhoneNumberQueryHandler> Logger { get; }
 
-        public GetUserWithPhoneNumberQueryHandler(ITelContext context,ILogger<GetUserWithPhoneNumberQueryHandler> logger)
+        public GetUserWithPhoneNumberQueryHandler(ITelContext context,IMediator mediator ,
+            ILogger<GetUserWithPhoneNumberQueryHandler> logger)
         {
             Context = context;
+            Mediator = mediator;
             Logger = logger;
         }
 
@@ -62,7 +66,8 @@ namespace PefectMoney.Core.UseCase.UserAction
             }
             catch (Exception e)
             {
-                Logger.LogError(e.Message);
+                Logger.LogError(e.Message, e.InnerException?.Message);
+                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation<UserDto>.ToFailedResult();
             }
           

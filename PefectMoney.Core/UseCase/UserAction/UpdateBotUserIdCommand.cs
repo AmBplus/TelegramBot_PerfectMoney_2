@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PefectMoney.Core.Data;
 using PefectMoney.Core.Model;
+using PefectMoney.Core.UseCase.Notify;
 using PefectMoney.Shared.Utility.ResultUtil;
 using System;
 using System.Collections.Generic;
@@ -28,14 +29,16 @@ namespace PefectMoney.Core.UseCase.UserAction
     }
     public class UpdateBotUserIdHandler : IRequestHandler<UpdateBotUserIdRequest, ResultOperation>
     {
-        public UpdateBotUserIdHandler(ILogger<UpdateBotUserIdHandler> logger , ITelContext context )
+        public UpdateBotUserIdHandler(ILogger<UpdateBotUserIdHandler> logger , ITelContext context,IMediator mediator )
         {
             Logger = logger;
             Context = context;
+            Mediator = mediator;
         }
 
         public ILogger<UpdateBotUserIdHandler> Logger { get; }
         public ITelContext Context { get; }
+        public IMediator Mediator { get; }
 
         public async Task<ResultOperation> Handle(UpdateBotUserIdRequest request, CancellationToken cancellationToken = default )
         {
@@ -55,6 +58,7 @@ namespace PefectMoney.Core.UseCase.UserAction
             catch (Exception e)
             {
                 Logger.LogError(e.Message);
+                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation.ToFailedResult();
             }
         }
