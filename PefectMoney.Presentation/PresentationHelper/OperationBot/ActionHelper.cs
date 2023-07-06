@@ -18,6 +18,8 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
         public ActionStatus ActionStatus { get; set; }
 
         public string Message { get; set; } 
+        public int Count{ get; set; } 
+        
      
 
     }

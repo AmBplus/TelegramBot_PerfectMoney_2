@@ -9,9 +9,9 @@ using PefectMoney.Core.Model;
 
 namespace PefectMoney.Data.Mapping
 {
-    public class UserMapping : IEntityTypeConfiguration<UserModel>
+    public class UserMapping : IEntityTypeConfiguration<UserEntity>
     {
-        public void Configure(EntityTypeBuilder<UserModel> builder)
+        public void Configure(EntityTypeBuilder<UserEntity> builder)
         {
             builder.HasKey(x => x.Id);
             builder.Property(x => x.FirstName).HasMaxLength(200).IsRequired(false);
@@ -26,10 +26,10 @@ namespace PefectMoney.Data.Mapping
             .HasForeignKey(b => b.UserId)
             .OnDelete(DeleteBehavior.Cascade);
             builder.HasOne(x => x.Roles).WithMany(x => x.Users).HasForeignKey(x => x.RoleId);
-            builder.HasData(new List<UserModel>()
+            builder.HasData(new List<UserEntity>()
             {
-                new UserModel("+989394059810",RoleName.Admin) { Id =1 },
-                new UserModel("+989308505480",RoleName.Admin) { Id =2 }
+                new UserEntity("+989394059810",RoleName.Admin) { Id =1 },
+                new UserEntity("+989308505480",RoleName.Admin) { Id =2 }
             });
         }
     }

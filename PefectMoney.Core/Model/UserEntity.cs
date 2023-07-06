@@ -4,9 +4,9 @@ using PefectMoney.Shared.Helper;
 
 namespace PefectMoney.Core.Model
 {
-    public class UserModel: Base<long>
+    public class UserEntity: Base<long>
     {
-        public UserModel(long botChatId,string phoneNumber,int roleId)
+        public UserEntity(long botChatId,string phoneNumber,int roleId)
         {
             BotChatId = botChatId;
             PhoneNumber = phoneNumber;
@@ -14,7 +14,7 @@ namespace PefectMoney.Core.Model
             CreationDate = TimeHelper.DateTimeNow;
             Active = true;
         }
-        public UserModel(string phoneNumber, int roleId)
+        public UserEntity(string phoneNumber, int roleId)
         {
            
             PhoneNumber = phoneNumber;
@@ -31,7 +31,7 @@ namespace PefectMoney.Core.Model
         public long BotChatId { get; set; }  
         public bool Active { get; set; }
         public int RoleId { get; set; }
-        public ICollection<BankCard> BankAccountNumbers { get; set; }
+        public ICollection<BankCardEntity> BankAccountNumbers { get; set; }
         public RoleModel? Roles { get; set; }
      
     }

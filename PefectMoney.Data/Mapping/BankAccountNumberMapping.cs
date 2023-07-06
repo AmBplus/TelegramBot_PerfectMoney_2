@@ -9,9 +9,9 @@ using PefectMoney.Core.Model;
 
 namespace PefectMoney.Data.Mapping
 {
-    class BankAccountNumberMapping : IEntityTypeConfiguration<BankCard>
+    class BankAccountNumberMapping : IEntityTypeConfiguration<BankCardEntity>
     {
-        public void Configure(EntityTypeBuilder<BankCard> builder)
+        public void Configure(EntityTypeBuilder<BankCardEntity> builder)
         {
             builder.HasOne(b => b.User)
                 .WithMany(u => u.BankAccountNumbers)

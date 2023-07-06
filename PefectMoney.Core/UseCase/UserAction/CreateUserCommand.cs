@@ -38,7 +38,7 @@ namespace PefectMoney.Core.UseCase.UserAction
         {
             try
             {
-                var user = new UserModel(request.UserDto.BotChatId, request.UserDto.PhoneNumber, request.UserDto.Roles.Id);
+                var user = new UserEntity(request.UserDto.BotChatId, request.UserDto.PhoneNumber, request.UserDto.Roles.Id);
                 await Context.AddAsync(user, cancellationToken);
                 await Context.SaveChangesAsync(cancellationToken);
                 return ResultOperation.ToSuccessResult();

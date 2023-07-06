@@ -13,7 +13,7 @@ namespace PefectMoney.Core.UseCase.VerifyCard
 {
     public class VerifyCardToken : IVerifyCardToken
     {
-        public VerifyCardToken(IOptions<VerifyAccountSettings> configuration,ILogger<VerifyCardToken> logger)
+        public VerifyCardToken(IOptions<VerifyBankCardSettings> configuration,ILogger<VerifyCardToken> logger)
         {
 
             VerifyAccountSettings = configuration.Value;
@@ -28,7 +28,7 @@ namespace PefectMoney.Core.UseCase.VerifyCard
         private RestRequest restRequest;
         private DateTime? DateExpireTokenLifeTime { get; set; }
 
-        private VerifyAccountSettings VerifyAccountSettings { get; }
+        private VerifyBankCardSettings VerifyAccountSettings { get; }
         public ILogger<VerifyCardToken> Logger { get; }
 
         public async Task<string> GetToken()

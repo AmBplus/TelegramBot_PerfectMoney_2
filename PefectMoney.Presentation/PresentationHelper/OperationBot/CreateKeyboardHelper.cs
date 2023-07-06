@@ -12,6 +12,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
 
         private static ReplyKeyboardMarkup? ShareContactKeyboradMarkup { get; set; }
         private static ReplyKeyboardMarkup? CardsMenuKeyBoards{ get; set; }
+        private static ReplyKeyboardMarkup? BuyProductMenuKeyBoards { get; set; }
         private static InlineKeyboardMarkup? Pagniate_Cancel_Menu_KeyBoards{ get; set; }
         private static InlineKeyboardMarkup? StopSelling_MenuKeyBoard{ get; set; }
         private static InlineKeyboardMarkup? Accept_UnAccept_Menu_MenuKeyBoard{ get; set; }
@@ -171,6 +172,20 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
             return AdminLawKeyBoard;
         }
 
+        public static ReplyKeyboardMarkup GetBuyProductKeyBoard()
+        {
+            if (BuyProductMenuKeyBoards is null)
+            {
+                BuyProductMenuKeyBoards = new(new[]
+                    {
+                        new KeyboardButton[]{ BotNameHelper.BuyVoicher,BotNameHelper.Menu},
+                    })
+                { ResizeKeyboard = true };
+            }
+
+            return BuyProductMenuKeyBoards;
+        }
+
 
         public static ReplyKeyboardMarkup GetAdminPanelKeyBoard()
         {
@@ -197,6 +212,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
                 CardsMenuKeyBoards = new ReplyKeyboardMarkup(new[]
                 {
                  new KeyboardButton[]{BotNameHelper.RegisteredCards ,BotNameHelper.AddNewCard},
+                 new KeyboardButton[]{BotNameHelper.Menu },
                
                 })
                 { InputFieldPlaceholder = "منو کارت ها", IsPersistent = true, ResizeKeyboard = true };

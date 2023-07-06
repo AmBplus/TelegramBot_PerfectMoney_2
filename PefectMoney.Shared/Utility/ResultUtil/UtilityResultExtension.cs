@@ -1,6 +1,8 @@
 ﻿using PefectMoney.Shared.Utility.ResultUtil;
+using System.Text;
 
 namespace PefectMoney.Shared.Utility.ResultUtil;
+
 
 /// <summary>
 /// اکستنشن هایی جهت راحت کردن استفاده از
@@ -8,6 +10,16 @@ namespace PefectMoney.Shared.Utility.ResultUtil;
 /// </summary>
 public static class UtilityResultExtension
 {
+
+    public static string GetSting(this IEnumerable<string> strings)
+    {
+        StringBuilder sb = new StringBuilder();
+        foreach (var str in strings)
+        {
+            sb.AppendLine(str);
+        }
+        return sb.ToString();   
+    }
     /// <summary>
     /// ساختن یک نتیجه عملیات موفق به صورت جنریک
     /// </summary>

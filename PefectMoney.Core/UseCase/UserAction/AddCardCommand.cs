@@ -41,7 +41,7 @@ namespace PefectMoney.Core.UseCase.UserAction
                     Logger.LogInformation(message);
                     return ResultOperation.ToFailedResult(message);
                 };
-                BankCard bankCard = new BankCard() { UserId = user.Id, CartNumber = request.CardNumber };
+                BankCardEntity bankCard = new BankCardEntity() { UserId = user.Id, CartNumber = request.CardNumber };
                 await Context.BankCards.AddAsync(bankCard);
                 await Context.SaveChangesAsync();
 

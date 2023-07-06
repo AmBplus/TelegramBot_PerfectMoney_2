@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -14,12 +15,16 @@ namespace PefectMoney.Core.Settings
 #pragma warning restore CA1050 // Declare types in namespaces
         public static readonly string Configuration = "BotSettings";
          
+        public string TokenExternalApp { get; set; }
+        public string ExternalAppBaseUrl { get; set; }
+        public string ValidBasketTime { get; set; }
         public bool StopSelling { get; set; } = false;
         // public bool Repair { get; set; }
         public List<string> RuleText { get; set; }
         [NotMapped]
         public string RuleTextAsOneString { get => _ruleTextAsOneString ??= MakeListRuleTextToSingleText(); }
         public string AboutUs { get; set; }
+        public string Token { get; set; }
         public bool StopBot { get; set; } = false;
         private string _ruleTextAsOneString;
         private string MakeListRuleTextToSingleText()

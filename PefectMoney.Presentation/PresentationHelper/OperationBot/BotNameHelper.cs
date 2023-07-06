@@ -29,6 +29,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
         public const string AccessDenied = "دسترسی شما به قسمت محدود می باشد";
         public const string BackToMenu = "برگشت به منو";
         public const string AcceptAction = "قبول عملیات";
+        public const string BuyVoicher = "خرید ووچر";
         // Adminpanel Keys
         public const string AdminPanel_SeeUsers = "دیدن کابران 👁";
         public const string AdminPanel_StopBot = "در دست تعمیر 🛠";

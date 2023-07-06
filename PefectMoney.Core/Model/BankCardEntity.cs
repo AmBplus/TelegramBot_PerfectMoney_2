@@ -7,12 +7,13 @@ using PefectMoney.Core.Model;
 
 namespace PefectMoney.Core.Model
 {
-    public class BankCard : Base<long>
+    public class BankCardEntity
+        : Base<long>
     {
         public string CartNumber { get; set; }
         public bool IsActive { get; set; }
         public long UserId { get; set; } // Foreign key property
 
-        public UserModel User { get; set; } // Navigation property
+        public UserEntity User { get; set; } // Navigation property
     }
 }

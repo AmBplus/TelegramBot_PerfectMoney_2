@@ -7,12 +7,16 @@ using System.Threading.Tasks;
 
 namespace PefectMoney.Core.Model
 {
-    public class Product : Base<long>
+    public class ProductEntity : Base<long>
     {
 
         public string Name { get; set; }
-        public long OrderId { get; set; }
-        public ICollection<Order> Orders { get; set; }
+        
+        public ICollection<OrderEntity> Orders { get; set; }
 
+    }
+    public enum ProductName : int
+    {
+        VoicherCode = 1 
     }
 }

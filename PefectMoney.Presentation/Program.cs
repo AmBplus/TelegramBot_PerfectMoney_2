@@ -17,7 +17,7 @@ var botConfigurationSection = builder.Configuration.GetSection(BotConfiguration.
 
 builder.Services.Configure<BotConfiguration>(botConfigurationSection);
 if(builder.Environment.EnvironmentName == Environments.Development)
-{
+{  
     builder.Services.ConfigureWritable<BotSettings>(builder.Configuration.GetSection(BotSettings.Configuration),file:$"appsettings.{Environments.Development}.json");
 }
 else

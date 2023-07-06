@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using PefectMoney.Core.Settings;
+using Newtonsoft.Json.Linq;
 
 namespace PefectMoney.Core.UseCase.VerifyCard
 {
@@ -25,26 +26,26 @@ namespace PefectMoney.Core.UseCase.VerifyCard
     public class VerifyUserCardHandler : IRequestHandler<VerifyUserCardRequestDto, ResultOperation>, IVerifyUserCard
     {
 
-        public VerifyUserCardHandler(IOptions<VerifyAccountSettings> configuration, IVerifyCardToken verifyCartToken, ILogger<VerifyUserCardHandler> logger)
+        public VerifyUserCardHandler(IOptions<VerifyBankCardSettings> configuration, IOptions<BotSettings> botsettings, ILogger<VerifyUserCardHandler> logger)
         {
             VerifyAccountSettings = configuration.Value;
-            VerifyCartToken = verifyCartToken;
+            Botsettings = botsettings.Value;
             Logger = logger;
-            RestClient = new RestClient(VerifyAccountSettings.Address);
+            RestClient = new RestClient(botsettings.Value.ExternalAppBaseUrl);
 
         }
         RestClient RestClient { get; set; }
-        VerifyAccountSettings VerifyAccountSettings { get; set; }
+        VerifyBankCardSettings VerifyAccountSettings { get; set; }
+        public BotSettings Botsettings { get; }
 
-        public IVerifyCardToken VerifyCartToken { get; }
         public ILogger<VerifyUserCardHandler> Logger { get; }
 
         public async Task<ResultOperation> Handle(VerifyUserCardRequestDto request, CancellationToken cancellationToken)
         {
             try
             {
-                var token = await VerifyCartToken.GetToken();
-                RestRequest restRequest = GenerateVerifyRestRequest(request.phoneNumber, request.cartNumber, request.trackId, token);
+               
+                RestRequest restRequest = GenerateVerifyRestRequest(request.phoneNumber, request.cartNumber, request.trackId);
 
                 var result = await RestClient.PostAsync<VerifyUserCardResponseDto>(restRequest, cancellationToken);
 
@@ -58,13 +59,8 @@ namespace PefectMoney.Core.UseCase.VerifyCard
                     // if Token Unvalid Generate Token
                     if (result.Error.Code == "UNAUTHORIZED")
                     {
-                        var newToken = await VerifyCartToken.GetNewToken();
-                        restRequest = GenerateVerifyRestRequest(request.phoneNumber, request.cartNumber, request.trackId, newToken);
-                        result = await RestClient.PostAsync<VerifyUserCardResponseDto>(restRequest);
-                        if (result.Result.IsValid)
-                        {
-                            return ResultOperation.ToSuccessResult();
-                        }
+
+                        return ResultOperation.ToFailedResult("خطای سیستمی بعدا امتحان نمایید");
                     }
                 }
 
@@ -94,15 +90,15 @@ namespace PefectMoney.Core.UseCase.VerifyCard
             }
         }
 
-        private RestRequest GenerateVerifyRestRequest(string phoneNumber, string cartNumber, string trackId, string token)
+        private RestRequest GenerateVerifyRestRequest(string phoneNumber, string cartNumber, string trackId)
         {
-            RestRequest restRequest = new RestRequest($"/kyc/v2/clients/{VerifyAccountSettings.ClientId}/mobileCardVerification?trackId={trackId}");
-            restRequest.Authenticator = new JwtAuthenticator(token);
+            RestRequest restRequest = new RestRequest($"{VerifyAccountSettings.VerifyCardlink}");
             restRequest.AddHeader("Content-Type", "application/json");
             restRequest.AddJsonBody(new
             {
                 mobile = phoneNumber,
-                cart = cartNumber
+                cart = cartNumber,
+                token = bot
             });
 
             return restRequest;

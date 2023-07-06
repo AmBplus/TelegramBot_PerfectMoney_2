@@ -12,10 +12,13 @@ namespace PefectMoney.Data.DataBase
     {
 
         private static string connectionString = "Server=localhost; User ID=root; Password=0903@m!rK; Database=TelBot";
-        public DbSet<UserModel> Users { get; set; }
+        public DbSet<UserEntity> Users { get; set; }
     
-        public DbSet<BankCard> BankCards { get; set; }
+        public DbSet<BankCardEntity> BankCards { get; set; }
         public DbSet<RoleModel> RoleModels{ get; set; }
+        public DbSet<VoicherCodeEntity> VoicherCodes { get ; set ; }
+        public DbSet<OrderEntity> Orders { get ; set ; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
          optionsBuilder

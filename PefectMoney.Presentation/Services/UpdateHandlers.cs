@@ -1,29 +1,20 @@
 ﻿using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
-
 using Telegram.Bot;
-
 using PefectMoney.Presentation.PresentationHelper.OperationBot;
-
 using PefectMoney.Presentation.PresentationHelper;
 using PefectMoney.Core.Model;
-
-
 using MediatR;
 using PefectMoney.Core.UseCase.UserAction;
-
 using PefectMoney.Core.UseCase._BotSettings;
 using PefectMoney.Core.Extensions;
 using System.Text;
 using PefectMoney.Presentation.PresentationHelper.Validator;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Configuration;
 using PefectMoney.Core.Settings;
 using PefectMoney.Core.UseCase.VerifyCard;
-using FluentValidation;
+using PefectMoney.Core.UseCase._Shop;
 
 namespace PefectMoney.Presentation.Services;
 
@@ -158,7 +149,7 @@ public class UpdateHandlers
         
         if (callback.Data is not { } callbackData)
             return;
-        if (BotSettings.StopSelling && user.Roles.Id  != RoleName.Admin)
+        if (BotSettings.StopBot && user.Roles.Id  != RoleName.Admin)
         {
             await RemoveAllPermantActions(user.BotChatId);
             await _botClient.DeleteMessageAsync(user.BotChatId, messageId: patientMessage.MessageId, cancellationToken);
@@ -201,23 +192,125 @@ public class UpdateHandlers
         
         if(callback.Data == BotNameHelper.AcceptAction)
         {
-            var action = botAction.ActionName switch
+         
+
+            Task action = botAction.ActionName switch
             {
-                BotNameHelper.AdminPanel_StopBot => StopBot(callback.Message.Chat.Id),
-                BotNameHelper.AdminPanel_StartBot => StartBot(callback.Message.Chat.Id),
-                BotNameHelper.AdminPanel_BanUser => DoBanUserBot(botAction,callback,cancellationToken),
-                BotNameHelper.AdminPanel_UnBanUser => DoUnBanUserBot(botAction, callback, cancellationToken),
-                BotNameHelper.AdminPanel_SetLaws => DoSetLaws(botAction, callback, cancellationToken),
-                _ => RemoveAllPermantActions(callback.Message.Chat.Id)
-            }; ;
+           
+                BotNameHelper.AddNewCard => DoAddNewCard(botAction,user, callback, cancellationToken),
+                BotNameHelper.BuyVoicher => DoBuyVoicher(botAction,user, callback, cancellationToken),
+                _ => CheckAdminActions(botAction,user, callback, cancellationToken),
+            };
+
             await action;
         }
         
         
         return;
+
     
     }
 
+    private async Task DoBuyVoicher(BotAction botAction, UserDto user, CallbackQuery callback, CancellationToken cancellationToken)
+    {
+        if(botAction.Count<=0)
+        {
+            await RemoveAllPermantActions(user.BotChatId);
+            await _botClient.SendTextMessageAsync(chatId: user.Id,
+                text: "تعداد خرید ووچر نا معتبر است",
+                replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
+            return;
+        }
+        
+        var result = await MediatR.Send(new GetVoicherPaymentLinkRequest(botAction.Count, user.BotChatId));
+        if(!result.IsSuccess)
+        {
+            await RemoveAllPermantActions(user.BotChatId);
+            await _botClient.SendTextMessageAsync(chatId: user.Id,
+                text: result.Message?.ToStringEnumerable() ?? "خطایی پیش آمده بعدا امتحان نمایید",
+                replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
+            return;
+        }
+        await RemoveAllPermantActions(user.BotChatId);
+        await _botClient.SendTextMessageAsync(chatId: user.Id,
+               text:  "لینک پرداخت برای شما ارسال شد"
+            );
+        InlineKeyboardMarkup inlineKeyboard = new(new[]
+        {
+    InlineKeyboardButton.WithUrl(
+        text: "لینک پرداخت",
+        url: $"{result.Data.ToString()}")
+          ,
+        InlineKeyboardButton.WithCallbackData(
+        text: BotNameHelper.CancelAction,
+        callbackData: $"{BotNameHelper.CancelAction}")
+        });
+        
+    }
+
+    private async Task<Task> CheckAdminActions(BotAction botAction, UserDto user, CallbackQuery callback, CancellationToken cancellationToken)
+    {
+        if (user.Roles.Id == RoleName.Admin)
+        {
+            return  botAction.ActionName switch
+            {
+                BotNameHelper.AdminPanel_StopBot => StopBot(callback.Message.Chat.Id),
+                BotNameHelper.AdminPanel_StartBot => StartBot(callback.Message.Chat.Id),
+                BotNameHelper.AdminPanel_BanUser => DoBanUserBot(botAction, callback, cancellationToken),
+                BotNameHelper.AdminPanel_UnBanUser => DoUnBanUserBot(botAction, callback, cancellationToken),
+                BotNameHelper.AdminPanel_SetLaws => DoSetLaws(botAction, callback, cancellationToken),
+                BotNameHelper.AddNewCard => DoSetLaws(botAction, callback, cancellationToken),
+                _ => RemoveAllPermantActions(callback.Message.Chat.Id)
+            };
+        }
+        return DoNothing();
+    }
+
+    private async Task DoAddNewCard(BotAction botAction,UserDto user, CallbackQuery callback, CancellationToken cancellationToken)
+    {
+        
+      
+        var trackId = Guid.NewGuid().ToString();
+        var resultVerifyCard = await MediatR.Send(new VerifyUserCardRequestDto { cartNumber = botAction.Message, phoneNumber = user.PhoneNumber, trackId = trackId });
+        if (resultVerifyCard.IsSuccess)
+        {
+            var resultAddCard = await MediatR.Send(new AddCardCommandRequest() { BotUserId = user.BotChatId, CardNumber = botAction.Message });
+            if (resultAddCard.IsSuccess)
+            {
+                await RemoveAllPermantActions(user.BotChatId);
+                await RemoveFromActionHelper(chatId: user.BotChatId);
+                 await _botClient.SendTextMessageAsync(
+              chatId: user.BotChatId,
+              text: "کارت شما ثبت شد",
+              replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey(),
+              cancellationToken: cancellationToken);
+                return;
+            }
+            else
+            {
+                await RemoveFromActionHelper(chatId: user.BotChatId);
+                 await _botClient.SendTextMessageAsync(
+            chatId: user.BotChatId,
+            text: resultAddCard?.Message?.ToStringEnumerable() ?? "کارت ثبت نشد",
+            replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey(),
+            cancellationToken: cancellationToken);
+                return;
+            }
+
+
+        }
+
+
+        await RemoveFromActionHelper(chatId: user.BotChatId);
+         await _botClient.SendTextMessageAsync(
+               chatId: user.BotChatId,
+               text: resultVerifyCard.Message!.ToStringEnumerable() ?? "خطا ، مشکلی آمده",
+               replyMarkup: new ReplyKeyboardRemove(),
+               cancellationToken: cancellationToken);
+        return;
+    }
+
+    private async Task DoNothing() { }
     private async Task DoSetLaws(BotAction botAction, CallbackQuery callback, CancellationToken cancellationToken)
     {
        var result = await MediatR.Send(new SetLawCommandRequest(botAction.Message));
@@ -550,6 +643,7 @@ public class UpdateHandlers
                 BotNameHelper.Law => ShowLaws(_botClient, message, cancellationToken),
                 BotNameHelper.AboutUs => AboutUs(_botClient, message, cancellationToken),
                 BotNameHelper.BuyingProduct => BuyingProduct(_botClient, message, cancellationToken),
+                BotNameHelper.BuyVoicher => ShowMenuBuyingVoicher(_botClient,user, message, cancellationToken),
                 BotNameHelper.Cards => Cards(_botClient, message, cancellationToken),
                 BotNameHelper.AddNewCard => NewCard(_botClient, message, cancellationToken),
                 BotNameHelper.RegisteredCards => RegisteredCards(_botClient, message, cancellationToken),
@@ -568,6 +662,44 @@ public class UpdateHandlers
                 replyMarkup: CreateKeyboardHelper.GetUserMenuKeyBoard(),
                 cancellationToken: cancellationToken);
         }
+    }
+
+    private async Task<Message> ShowMenuBuyingVoicher(ITelegramBotClient botClient,UserDto user, Message message, CancellationToken cancellationToken)
+    {
+        AddActionToActionHelper(user.BotChatId, new BotAction { ActionName = BotNameHelper.BuyVoicher });
+
+        var result = await MediatR.Send(new GetUserCardsRequest(user.BotChatId) { });
+        if(!result.IsSuccess)
+        {
+            await RemoveAllPermantActions(user.BotChatId);
+            return await botClient.SendTextMessageAsync(
+               chatId: message.Chat.Id,
+               text: "مشکلی پیش آمده بعدا امتحان نمایید",
+               replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey(),
+               cancellationToken: cancellationToken);
+        }
+        // دریافت قیمت ووچر
+        VoicherValueDto voicherValue = null;
+        var amoutVoicherTxt = CreateString("نرخ لحظه ای ووچر", $"قیمت هر ووچر به ریال : {voicherValue?.Rials}", $"قیمت هر ووچر به دلار : {voicherValue?.Dollars}");
+        if(result.Data.UserCards.Count < 1)
+        {
+            var msg = CreateString("برای خرید ووچر ابتدا باید یک کارت بانکی ثبت کنید", "ابتدا کارت خود را ثبت نمایید","در صورت عدم ثبت کارت امکان خرید ندارید", amoutVoicherTxt);
+            await RemoveAllPermantActions(user.BotChatId);
+            return await botClient.SendTextMessageAsync(
+               chatId: message.Chat.Id,
+               text: msg,
+               replyMarkup: CreateKeyboardHelper.GetCardsMenuKeyBoard(),
+               cancellationToken: cancellationToken);
+        }
+
+       var txt = CreateString(amoutVoicherTxt, "در صورتی قصد خرید دارید", "تعداد ووچری که قصد خرید آن را دارید وارد نمایید");
+        await RemoveAllPermantActions(user.BotChatId);
+        return await botClient.SendTextMessageAsync(
+           chatId: message.Chat.Id,
+           text: txt,
+           replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey(),
+           cancellationToken: cancellationToken);
+       
     }
 
     private async Task<Message> AdminPanel_SeeUsers(ITelegramBotClient botClient,UserDto userDto, Message message, CancellationToken cancellationToken)
@@ -751,10 +883,14 @@ public class UpdateHandlers
             }
             case BotNameHelper.AddNewCard:
                 {
-                    await AddNewCard(botClient, botAction, message, cancellationToken);
+                    await CheckNumberNewCard(botClient, botAction, message, cancellationToken);
                     return;
                 }
-
+            case BotNameHelper.BuyVoicher:
+                {
+                    await VerifyBuyVoicher(botClient,userDto, botAction, message, cancellationToken);
+                    return;
+                }
             default: break;
         }
 
@@ -786,6 +922,45 @@ public class UpdateHandlers
             }
         }
 
+    }
+
+    private async Task VerifyBuyVoicher(ITelegramBotClient botClient, UserDto userDto, BotAction botAction, Message message, CancellationToken cancellationToken)
+    {
+        var convertNumberToEngNumber = NumberConverter.ConvertToEnglishNumbers(message.Text);
+        ValidateCountBuyVoicher validations = new ValidateCountBuyVoicher();
+        var resultValidate = await validations.ValidateAsync(new ValidateCountBuyVoicherTxt(message.Text));
+
+        if (resultValidate.Errors.Count > 0)
+        {
+            await botClient.SendTextMessageAsync(
+              chatId: message.Chat.Id,
+              text: resultValidate.Errors.ToStringErrors(),
+              replyMarkup: CreateKeyboardHelper.GetMenuCancelKeyBoard(),
+              cancellationToken: cancellationToken);
+            return;
+        }
+        var resultVoicherValue = await MediatR.Send(new GetOnTimeVoicherValueRequest());
+        if (resultVoicherValue == null || resultVoicherValue.IsSuccess == false)
+        {
+            await RemoveAllPermantActions(userDto.BotChatId);
+            await botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
+            text: resultVoicherValue?.Message?.ToStringEnumerable() ?? "خطایی پیش آمده بعدا امتحان نمایید",
+            replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey(),
+            cancellationToken: cancellationToken);
+            return;
+        }
+        var amoutVoicherTxt = CreateString(" باتوجه نرخ لحظه ای ووچر"
+            , $"قیمت هر ووچر به ریال : {resultVoicherValue.Data?.Rials}",
+            $"قیمت هر ووچر به دلار : {resultVoicherValue.Data?.Dollars}");
+         
+        var count = Convert.ToInt32(convertNumberToEngNumber);
+        botAction.Count = count;
+        var txt = CreateString($"تعدادی که شما وارد کردید :{convertNumberToEngNumber}"
+            , amoutVoicherTxt,$"قیمت ریالی برای شما :{count * resultVoicherValue.Data.Rials}",
+            $"قیمت ریالی برای شما :{((long)count)*resultVoicherValue.Data.Dollars}",
+            "در صورت تایید از منو زیر تایید را انتخاب کنید تا لینک پرداخت برای شما ارسال شود");
+        await _botClient.SendTextMessageAsync(chatId: message.Chat.Id, txt, replyMarkup: CreateKeyboardHelper.GetAcceptCancelKeyBoardBoard());
     }
 
     private async Task UnBanUser(ITelegramBotClient botClient, BotAction botAction, Message message, CancellationToken cancellationToken)
@@ -969,7 +1144,7 @@ public class UpdateHandlers
         if(perBotAction!= null) { ActionHelper.BotActions.Remove(chatId); }
         ActionHelper.BotActions.Add(chatId, botAction);
     }
-    private async Task<Message> AddNewCard(ITelegramBotClient botClient,BotAction botAction, Message message, CancellationToken cancellationToken)
+    private async Task<Message> CheckNumberNewCard(ITelegramBotClient botClient,BotAction botAction, Message message, CancellationToken cancellationToken)
     {
         if (botAction.ActionName != BotNameHelper.AddNewCard ) return message;
 
@@ -987,49 +1162,18 @@ public class UpdateHandlers
                replyMarkup: CreateKeyboardHelper.GetMenuCancelKeyBoard(),
                cancellationToken: cancellationToken);
         }
-        // if valid
-        // Get User 
-       var user = await MediatR.Send(new GetUserByBotUserIdQueryRequest(message.Chat.Id));
-        if(user == null)  return message;
-        if (user.PhoneNumber == null)
-        {
-            // Log.LogError()
-            await RemoveFromActionHelper(chatId: message.Chat.Id);
-            _logger.LogError("خطای منطقی ، شماره تلفن نباید خالی باشد");
-        }
-        var trackId = Guid.NewGuid().ToString();
-        var resultVerifyCard = await MediatR.Send(new VerifyUserCardRequestDto { cartNumber = cardNumber, phoneNumber = user.PhoneNumber, trackId = trackId });
-        if(resultVerifyCard.IsSuccess)
-        {
-            var resultAddCard =  await MediatR.Send(new AddCardCommandRequest() { BotUserId = message.Chat.Id, CardNumber = cardNumber });
-            if(resultAddCard.IsSuccess)
-            {
-                await RemoveFromActionHelper(chatId: message.Chat.Id);
-                return await botClient.SendTextMessageAsync(
-              chatId: message.Chat.Id,
-              text: "کارت شما ثبت شد",
-              replyMarkup: new ReplyKeyboardMarkup(new KeyboardButton("تایید")),
-              cancellationToken: cancellationToken);
-            }
-            else
-            {
-                await RemoveFromActionHelper(chatId: message.Chat.Id);
-                return await botClient.SendTextMessageAsync(
-            chatId: message.Chat.Id,
-            text: resultAddCard.Message.ToStringEnumerable(),
-            replyMarkup: new ReplyKeyboardMarkup(new KeyboardButton("تایید")),
-            cancellationToken: cancellationToken);
-            }
-
-        }
-
-
-        await RemoveFromActionHelper(chatId: message.Chat.Id);
+        var msg = CreateString("شماره کارت زیر از جهت شما دریافت گردیده", "اگر شما صاحب این کارت هستید",
+            "و  قصد اضافه کردن این کارت را دارید",
+            "میتوانید از منو نشان داده شده با تایید آن را به کارت ها خود اضافه کنید",
+            $"شماره کارت دریافت شده :{cardNumber}", "تایید:اضافه شدن کارت", "کنسل:لغو عملیات"
+            );
+        botAction.Message = cardNumber;
         return await botClient.SendTextMessageAsync(
-               chatId: message.Chat.Id,
-               text: resultVerifyCard.Message!.ToStringEnumerable() ?? "خطا ، مشکلی آمده",
-               replyMarkup: new ReplyKeyboardRemove(),
-               cancellationToken: cancellationToken);
+              chatId: message.Chat.Id,
+              text: msg,
+              replyMarkup: CreateKeyboardHelper.GetAcceptCancelKeyBoardBoard(),
+              cancellationToken: cancellationToken);
+
    
     }
     private async Task<Message> NewCard(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
@@ -1065,7 +1209,7 @@ public class UpdateHandlers
         return await botClient.SendTextMessageAsync(
           chatId: message.Chat.Id,
           text:"این بخش هنوز پیاده سازی نشده",
-          replyMarkup: new ReplyKeyboardRemove(),
+          replyMarkup: CreateKeyboardHelper.GetBuyProductKeyBoard(),
           cancellationToken: cancellationToken);
     }
     private async Task<Message> AboutUs(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)

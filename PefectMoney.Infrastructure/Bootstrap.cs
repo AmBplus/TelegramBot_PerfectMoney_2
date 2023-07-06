@@ -23,8 +23,8 @@ namespace PefectMoney.Infrastructure
             var con = configuration.GetConnectionString("MySqlConnection");
        
             
-            services.Configure<VerifyAccountSettings>(
-             configuration.GetSection(VerifyAccountSettings.Configuration));
+            services.Configure<VerifyBankCardSettings>(
+             configuration.GetSection(VerifyBankCardSettings.Configuration));
 
             services.Configure<ZibalPaymentSettings>(
             configuration.GetSection(ZibalPaymentSettings.Configuration));
@@ -43,7 +43,7 @@ namespace PefectMoney.Infrastructure
             services.AddSingleton<IVerifyCardToken, VerifyCardToken>();
             services.AddTransient<IVerifyUserCard, VerifyUserCardHandler>();
 
-            services.AddMediatR(cfg=>cfg.RegisterServicesFromAssemblies(typeof(UserModel).Assembly));
+            services.AddMediatR(cfg=>cfg.RegisterServicesFromAssemblies(typeof(UserEntity).Assembly));
 
 
 
