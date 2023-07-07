@@ -64,15 +64,17 @@ public class UpdateHandlers
     public async Task HandleUpdateAsync(Telegram.Bot.Types.Update update, CancellationToken cancellationToken)
         {
 
-
+        Message messages;
         long id = 0;
         if (update.Message?.Chat?.Id != null)
         {
             id = update.Message!.Chat!.Id;
+            messages = update.Message;
         }
         else if (update.CallbackQuery?.Message?.Chat.Id != null)
         {
             id = update.CallbackQuery.Message.Chat.Id;
+            messages = update.CallbackQuery.Message;
         }
         else
         {
@@ -80,6 +82,15 @@ public class UpdateHandlers
             return;
         }
          patientMessage = await _botClient.SendTextMessageAsync(id, "درخواست شما در حال بررسی است لطفا شکیبا باشید");
+        #region User Get Or Create _ Update
+        var user = await MediatR.Send(new GetUserByBotUserIdQueryRequest(id));
+        if (user == null)
+        {
+            var result = await CreateUser(messages, cancellationToken);
+            if (result == null) return;
+            user = result;
+        }
+        #endregion
         var BotSettings = await MediatR.Send(new GetBotSettingsRequest());
         if(BotSettings.StopBot)
         {
@@ -101,8 +112,8 @@ public class UpdateHandlers
         var handler = update switch
         {
          
-            { Message: { } message }                       => BotOnMessageReceived(message, cancellationToken),   
-            { CallbackQuery: { } callbackQuery}            => BotOnCallBackReceived(callbackQuery, cancellationToken),   
+            { Message: { } message }                       => BotOnMessageReceived(message,user, cancellationToken),   
+            { CallbackQuery: { } callbackQuery}            => BotOnCallBackReceived(callbackQuery,user, cancellationToken),   
             _                                              => UnknownUpdateHandlerAsync(update, cancellationToken)
         };
 
@@ -126,7 +137,7 @@ public class UpdateHandlers
         await StartBot(update.CallbackQuery.Message.Chat.Id);
     }
 
-    private async Task BotOnCallBackReceived(CallbackQuery callback, CancellationToken cancellationToken)
+    private async Task BotOnCallBackReceived(CallbackQuery callback,UserDto user, CancellationToken cancellationToken)
     {
       
         if(callback == null || callback.Message== null)
@@ -134,13 +145,7 @@ public class UpdateHandlers
             return;
         }
 
-        var user = await MediatR.Send(new GetUserByBotUserIdQueryRequest(callback.Message.Chat.Id));
-        if (user == null)
-        {
-            var result = await CreateUser(callback.Message, cancellationToken);
-            if (result == null) return;
-            user = result;
-        }
+      
         if(!user.IsActive)
         {
            await _botClient.SendTextMessageAsync(chatId: callback.Message.Chat.Id, text: "دسترسی شما این بات گرفته شده و اجازه دسترسی ندارید");
@@ -558,18 +563,10 @@ public class UpdateHandlers
             IsLast = false,
         });
     }
-    private async Task BotOnMessageReceived(Message message, CancellationToken cancellationToken)
+    private async Task BotOnMessageReceived(Message message,UserDto user, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Receive message type: {MessageType}", message.Type);
-        #region User Get Or Create _ Update
-        var user = await MediatR.Send(new GetUserByBotUserIdQueryRequest(message.Chat.Id));
-        if (user == null)
-        {
-            var result = await CreateUser(message, cancellationToken);
-            if (result == null) return;
-            user = result;
-        }
-        #endregion
+     
         if (BotSettings.StopSelling && user.Roles.Id != RoleName.Admin)
         {
             await RemoveAllPermantActions(user.BotChatId);

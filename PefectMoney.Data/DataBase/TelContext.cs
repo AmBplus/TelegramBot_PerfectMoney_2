@@ -1,7 +1,8 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using PefectMoney.Core.Data;
 using PefectMoney.Core.Model;
 using PefectMoney.Data.Mapping;
@@ -10,8 +11,12 @@ namespace PefectMoney.Data.DataBase
 {
     public class TelContext:DbContext , ITelContext
     {
+        public TelContext(IConfiguration configuration)
+        {
+            connectionString = configuration.GetConnectionString("MySqlConnection");
+        }
 
-        private static string connectionString = "Server=localhost; User ID=root; Password=0903@m!rK; Database=TelBot";
+        private  string connectionString { get; set; }
         public DbSet<UserEntity> Users { get; set; }
     
         public DbSet<BankCardEntity> BankCards { get; set; }

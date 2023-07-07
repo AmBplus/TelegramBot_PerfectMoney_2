@@ -2,9 +2,9 @@
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Hosting;
-using PerfectMonney_ConnectorToExternalService.Settings;
+using PefectMoney.Core.Settings;
 
-namespace PerfectMonney_ConnectorToExternalService.Services
+namespace WebApp
 {
 
     public class WritableOptions<T> : IWritableOptions<T> where T : class, new()
