@@ -13,7 +13,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://4cdc-2a03-ef43-b-9d2f-811d-8e9c-e555-3965.ngrok-free.app;https://localhost:443"
+      "applicationUrl": "https://ecfc-2a03-ef43-d-25c5-f582-1b08-9e3-d793.ngrok-free.app;https://localhost:443"
     }
   }
 }

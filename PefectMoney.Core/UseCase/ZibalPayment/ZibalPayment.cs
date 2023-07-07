@@ -71,7 +71,7 @@ public class ZiBalPaymentHandler : IRequestHandler<ZibalPaymentRequest, ResultOp
 
     public ZiBalPaymentHandler(IOptions<ZibalPaymentSettings> zibalPaymentSettings,
         IOptions<BotSettings> options,IMediator mediator,
-        Logger<ZiBalPaymentHandler> logger)
+        ILogger<ZiBalPaymentHandler> logger)
     {
         ZibalPaymentSettings = zibalPaymentSettings.Value;
         BotSettings = options.Value;
@@ -81,7 +81,7 @@ public class ZiBalPaymentHandler : IRequestHandler<ZibalPaymentRequest, ResultOp
     public ZibalPaymentSettings ZibalPaymentSettings { get; set; }
     public BotSettings BotSettings { get; }
     public IMediator Mediator { get; }
-    public Logger<ZiBalPaymentHandler> Logger { get; }
+    public ILogger<ZiBalPaymentHandler> Logger { get; }
 
     //public string description { get; set; }
     public async Task<ResultOperation<ZiBalPaymentHandlerResponse>> Handle(ZibalPaymentRequest request

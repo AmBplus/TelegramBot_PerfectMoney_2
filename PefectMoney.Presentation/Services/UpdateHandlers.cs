@@ -679,11 +679,15 @@ public class UpdateHandlers
         foreach (var res in result.Data)
         {
             var msg = CreateString($"شماره سفارش :{res.OrderId}", $"بات آیدی کاربر :{res.UserBotChatId}", $"کد ووچر :{res.VoicherCode}");
-            return await botClient.SendTextMessageAsync
+             await botClient.SendTextMessageAsync
               (chatId: user.BotChatId,
               text: msg
-              , replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
+              );
         }
+        return await botClient.SendTextMessageAsync
+         (chatId: user.BotChatId,
+         text: "اتمام لیست"
+         , replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
     }
 
     private async Task<Message> ShowMenuBuyingVoicher(ITelegramBotClient botClient,UserDto user, Message message, CancellationToken cancellationToken)
