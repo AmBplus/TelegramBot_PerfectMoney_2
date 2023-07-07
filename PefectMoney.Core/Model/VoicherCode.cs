@@ -16,9 +16,11 @@ namespace PefectMoney.Core.Model
             CreationDate = TimeHelper.DateTimeNow;
         }
         public string VoicherCode { get; set; }
-        public long OrderId { get; set; }
-        public OrderEntity Order { get; set; }
         
-        public long BotChatId { get; set; }
+        public long UserBotChatId { get; set; }
+        public OrderEntity Order { get; set; }
+        public long OrderId { get; set; }
+
+
     }
 }

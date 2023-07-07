@@ -102,7 +102,7 @@ namespace PefectMoney.Core.UseCase.UserAction
                 if(listUserDto == null)
                 {
                     Logger.LogError("تعداد کاربران دریافتی در این تابع نمیتواند نال بشود {GetPagninateUserQueryHandler}");
-                    await Mediator.Publish(new NotifyAdminRequest($"{GetPagninateUserQueryHandler} تعداد کاربران دریافتی در این تابع نمیتواند نال بشود"));
+                    await Mediator.Publish(new NotifyAdminRequest("{GetPagninateUserQueryHandler} تعداد کاربران دریافتی در این تابع نمیتواند نال بشود"));
                     return ResultOperation<PaginateGetUserQueryResponse>.ToFailedResult("خطایی پیش آمده");
                 }
                 return response.ToSuccessResult();

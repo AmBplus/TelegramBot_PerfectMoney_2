@@ -92,6 +92,8 @@ namespace PefectMoney.Core.UseCase.ZibalPayment
                         ,$"تاریخ پرداخت : {request.paidAt}"
                         );
                         await Mediator.Publish(new NotifyAdminRequest(str));
+                        await Mediator.Publish(new NotifyPaymentToUserRequest()
+                        {BotChatId = orderDto.BotChatId,Message = str,OrderId=orderDto.Id });    
                         return orderDto.ToSuccessResult();
                     }
                     else

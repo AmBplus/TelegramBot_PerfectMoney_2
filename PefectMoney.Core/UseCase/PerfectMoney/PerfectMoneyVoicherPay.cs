@@ -62,7 +62,7 @@ namespace PefectMoney.Core.UseCase.PerfectMoney
                     {
                         Context.VoicherCodes.Add(new VoicherCodeEntity {
                             VoicherCode = StringExtensionHelper.CreateString(result.Message)
-                            ,OrderId = order.Id ,BotChatId = order.BotChatId});
+                            ,OrderId = order.Id ,UserBotChatId = order.BotChatId});
                         await Context.SaveChangesAsync(); 
 
                     }

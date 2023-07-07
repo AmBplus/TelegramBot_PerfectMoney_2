@@ -73,7 +73,7 @@ namespace PefectMoney.Core.UseCase.VerifyCard
                     {
 
                         Logger.LogError(matchToVerifyUserCardResponseErrorCode.Name);
-                        await Mediator.Publish(new NotifyAdminRequest($"{matchToVerifyUserCardResponseErrorCode.Name}"));
+                        
                         return ResultOperation.ToFailedResult(matchToVerifyUserCardResponseErrorCode.Name);
                     }
                     else if (matchToVerifyUserCardResponseErrorCode.Status == TypeErrorCodeStatus.DestinationSystemError)

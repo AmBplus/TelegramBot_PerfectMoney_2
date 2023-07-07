@@ -132,7 +132,7 @@ public class ZiBalPaymentHandler : IRequestHandler<ZibalPaymentRequest, ResultOp
 
                 if (error?.TypeErrorCodeStatus == TypeErrorCodeStatus.UserError)
                 {
-                await Mediator.Publish(new NotifyAdminRequest($"ZiBalPaymentHandlerResponse -- {responseCode} == {error?.Name} == TypeErrorCodeStatus.UserError"));
+               
                 return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult(error.Name);
                 }
                  await Mediator.Publish(new NotifyAdminRequest($"{error.Name}"));

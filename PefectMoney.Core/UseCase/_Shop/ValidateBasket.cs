@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using PefectMoney.Core.Data;
 using PefectMoney.Core.Model;
 using PefectMoney.Core.Settings;
+using PefectMoney.Core.UseCase.Notify;
 using PefectMoney.Shared.Helper;
 using PefectMoney.Shared.Utility.ResultUtil;
 
@@ -16,14 +17,17 @@ namespace PefectMoney.Core.UseCase._Shop
     }
     public class ValidateBasketHandler : IRequestHandler<ValidateBasketRequest, ResultOperation>
     {
-        public ValidateBasketHandler(ITelContext context,ILogger<ValidateBasketHandler> logger,IOptions<BotSettings> options)
+        public ValidateBasketHandler(ITelContext context,IMediator mediator,
+            ILogger<ValidateBasketHandler> logger,IOptions<BotSettings> options)
         {
             Context = context;
+            Mediator = mediator;
             Logger = logger;
             BotSettings = options.Value ;
         }
 
         public ITelContext Context { get; }
+        public IMediator Mediator { get; }
         public ILogger<ValidateBasketHandler> Logger { get; }
         public BotSettings BotSettings { get; }
 
@@ -57,6 +61,7 @@ namespace PefectMoney.Core.UseCase._Shop
             catch (Exception e)
             {
                 Logger.LogError(e.Message, e.InnerException?.Message);
+                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation.ToFailedResult();
             }
            

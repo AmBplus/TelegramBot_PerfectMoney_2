@@ -28,6 +28,10 @@ namespace PefectMoney.Core.Model
      
         public int Rial { get; set; }
         public double Dollar { get; set; }
+
+        public VoicherCodeEntity VoicherCode { get; set; }
+        public long VoicherCodeId { get; set; }
+     
     }
 
     public enum OrderStatus : int

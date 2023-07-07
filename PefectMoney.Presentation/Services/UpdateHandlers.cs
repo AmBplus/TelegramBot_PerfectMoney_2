@@ -617,6 +617,7 @@ public class UpdateHandlers
                 BotNameHelper.RegisteredCards => RegisteredCards(_botClient, message, cancellationToken),
                 BotNameHelper.AdminPanel => AdminPanel(_botClient, message, cancellationToken),
                 BotNameHelper.AdminMenu => AdminMenu(_botClient, message, cancellationToken),
+                BotNameHelper.PurchasedVuchers => ShowPurchasedVuchers(_botClient,user, message, cancellationToken),
                 // 
                 // AdminPanel Key
 
@@ -661,6 +662,27 @@ public class UpdateHandlers
                 text: "Menu",
                 replyMarkup: CreateKeyboardHelper.GetUserMenuKeyBoard(),
                 cancellationToken: cancellationToken);
+        }
+    }
+
+    private async Task<Message> ShowPurchasedVuchers(ITelegramBotClient botClient, UserDto user, Message message, CancellationToken cancellationToken)
+    {
+       var result = await MediatR.Send(new GetVoicherCodeByBotChatIdRequest(user.BotChatId));
+        if (!result.IsSuccess)
+        {
+            var msg = result.Message?.ToStringEnumerable();
+            return await botClient.SendTextMessageAsync
+                (chatId: user.BotChatId,
+                text: msg ?? "خطا"
+                , replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
+        }
+        foreach (var res in result.Data)
+        {
+            var msg = CreateString($"شماره سفارش :{res.OrderId}", $"بات آیدی کاربر :{res.UserBotChatId}", $"کد ووچر :{res.VoicherCode}");
+            return await botClient.SendTextMessageAsync
+              (chatId: user.BotChatId,
+              text: msg
+              , replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
         }
     }
 

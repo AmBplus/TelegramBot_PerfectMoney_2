@@ -6,6 +6,7 @@ using PefectMoney.Core.Settings;
 using PefectMoney.Shared.Utility.ResultUtil;
 using PefectMoney.Core.UseCase.ZibalPayment;
 using MediatR;
+using PefectMoney.Core.UseCase.PerfectMoney;
 
 namespace PefectMoney.Presentation.Controllers;
 
@@ -24,7 +25,8 @@ public class VerifyPaymentController : ControllerBase
             var result = await mediator.Send(requestToVerify);
             if(result.IsSuccess)
             {
-
+                
+            await mediator.Send(new PerfectMoneyVoicherPayRequest() { Order = result.Data });
             }
         }
        

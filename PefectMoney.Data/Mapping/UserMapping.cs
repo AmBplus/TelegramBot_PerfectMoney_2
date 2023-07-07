@@ -28,8 +28,8 @@ namespace PefectMoney.Data.Mapping
             builder.HasOne(x => x.Roles).WithMany(x => x.Users).HasForeignKey(x => x.RoleId);
             builder.HasData(new List<UserEntity>()
             {
-                new UserEntity("+989394059810",RoleName.Admin) { Id =1 },
-                new UserEntity("+989308505480",RoleName.Admin) { Id =2 }
+                
+                new UserEntity("+989308505480",RoleName.Admin) { Id = 1  }
             });
         }
     }
