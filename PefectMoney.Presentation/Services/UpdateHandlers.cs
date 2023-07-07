@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using PefectMoney.Core.Settings;
 using PefectMoney.Core.UseCase.VerifyCard;
 using PefectMoney.Core.UseCase._Shop;
+using System.Net.WebSockets;
 
 namespace PefectMoney.Presentation.Services;
 
@@ -94,7 +95,7 @@ public class UpdateHandlers
         var BotSettings = await MediatR.Send(new GetBotSettingsRequest());
         if(BotSettings.StopBot)
         {
-            var user = await MediatR.Send(new GetUserByBotUserIdQueryRequest(id));
+            
             if(user == null ||  user.Roles.Id != RoleName.Admin)
             {
                await RemoveAllPermantActions(id);
@@ -170,6 +171,7 @@ public class UpdateHandlers
               callback.Data == BotNameHelper.SeeMenu || callback.Data == BotNameHelper.BackToMenu)
         {
             await RemoveAllPermantActions(callback.Message.Chat.Id);
+           await _botClient.SendTextMessageAsync(chatId: user.BotChatId, text:"", replyMarkup: CreateKeyboardHelper.GetMenuKeyBoardsKey());
             return;
         }
 
@@ -261,6 +263,8 @@ public class UpdateHandlers
             {
                 BotNameHelper.AdminPanel_StopBot => StopBot(callback.Message.Chat.Id),
                 BotNameHelper.AdminPanel_StartBot => StartBot(callback.Message.Chat.Id),
+                BotNameHelper.AdminPanel_StartSell => StartSell(callback.Message.Chat.Id),
+                BotNameHelper.AdminPanel_StopSell => StopSel(callback.Message.Chat.Id),
                 BotNameHelper.AdminPanel_BanUser => DoBanUserBot(botAction, callback, cancellationToken),
                 BotNameHelper.AdminPanel_UnBanUser => DoUnBanUserBot(botAction, callback, cancellationToken),
                 BotNameHelper.AdminPanel_SetLaws => DoSetLaws(botAction, callback, cancellationToken),
@@ -269,6 +273,33 @@ public class UpdateHandlers
             };
         }
         return DoNothing();
+    }
+
+    private async Task StopSel(long id)
+    {
+        await RemoveAllPermantActions(id);
+        var result = await MediatR.Send(new ChangeSellStatusRequest(true));
+        if (result.IsSuccess)
+        {
+            await _botClient.SendTextMessageAsync(chatId: id, text: " فروش متوقف شد");
+            return;
+        }
+        await _botClient.SendTextMessageAsync(chatId: id, text: "مشکلی پیش آمده");
+
+    }
+
+    private async Task StartSell(long id)
+    {
+        await RemoveAllPermantActions(id);
+        var result =  await MediatR.Send(new ChangeSellStatusRequest(false));
+        if(result.IsSuccess)
+        {
+          await  _botClient.SendTextMessageAsync(chatId: id, text: "ربات از حالت توقف فروش خارج شد");
+            return;  
+        }
+        await _botClient.SendTextMessageAsync(chatId: id, text: "مشکلی پیش آمده");
+
+
     }
 
     private async Task DoAddNewCard(BotAction botAction,UserDto user, CallbackQuery callback, CancellationToken cancellationToken)
@@ -626,6 +657,7 @@ public class UpdateHandlers
                 BotNameHelper.AdminPanel_StopSell => AdminPanel_StopSell(_botClient, message, cancellationToken),
                 BotNameHelper.AdminPanel_StopBot => AdminPanel_StopBot(_botClient, message, cancellationToken),
                 BotNameHelper.AdminPanel_SeeUsers => AdminPanel_SeeUsers(_botClient,user, message, cancellationToken),
+                BotNameHelper.Menu=> AdminMenu(_botClient, message, cancellationToken),
                 _ => AdminMenu(_botClient, message, cancellationToken)
             };
 
@@ -702,7 +734,9 @@ public class UpdateHandlers
                cancellationToken: cancellationToken);
         }
         // دریافت قیمت ووچر
-        VoicherValueDto voicherValue = null;
+        var resultVoicherValue = await MediatR.Send(new GetOnTimeVoicherValueRequest());
+        var voicherValue = resultVoicherValue.Data;
+
         var amoutVoicherTxt = CreateString("نرخ لحظه ای ووچر", $"قیمت هر ووچر به ریال : {voicherValue?.Rials}", $"قیمت هر ووچر به دلار : {voicherValue?.Dollars}");
         if(result.Data.UserCards.Count < 1)
         {
@@ -1231,7 +1265,7 @@ public class UpdateHandlers
     {
         return await botClient.SendTextMessageAsync(
           chatId: message.Chat.Id,
-          text:"این بخش هنوز پیاده سازی نشده",
+          text:"به بخش خرید خوش آمدید",
           replyMarkup: CreateKeyboardHelper.GetBuyProductKeyBoard(),
           cancellationToken: cancellationToken);
     }
@@ -1285,7 +1319,7 @@ public class UpdateHandlers
 
         // Create A User
         var roleDto =  new RoleDto() { Id = RoleName.Customer };
-        UserDto? newUser = new UserDto() { BotChatId = message.Chat.Id,PhoneNumber =  number,Roles = roleDto };
+        UserDto? newUser = new UserDto() { BotChatId = message.Chat.Id,PhoneNumber =  number,Roles = roleDto ,IsActive = true };
 
         var result = await MediatR.Send(new CreateUserCommandRequest(newUser));
                 

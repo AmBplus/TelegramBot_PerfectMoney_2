@@ -34,7 +34,7 @@ namespace PefectMoney.Core.UseCase._BotSettings
         public async Task<ResultOperation> Handle(BotChangeStatusCommandRequest request, CancellationToken cancellationToken)
         {
             //  var botSettingsSection = Configuration.GetSection(BotSettings.Configuration);
-            WritableOptions.Update(x => x.StopBot = true);
+            WritableOptions.Update(x => x.StopBot = request.Status);
           
             var botSettings = await Mediator.Send(new GetBotSettingsRequest());
             botSettings.StopBot = request.Status;

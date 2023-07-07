@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PefectMoney.Data.DataBase;
 
@@ -10,9 +11,10 @@ using PefectMoney.Data.DataBase;
 namespace PefectMoney.Data.Migrations
 {
     [DbContext(typeof(TelContext))]
-    partial class TelContextModelSnapshot : ModelSnapshot
+    [Migration("20230707170504_ACTIVE")]
+    partial class ACTIVE
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

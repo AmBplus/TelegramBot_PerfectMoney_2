@@ -19,7 +19,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
         private static InlineKeyboardMarkup? StopBot_MenuKeyBoard{ get; set; }
         private static InlineKeyboardMarkup? UserPaginationMenuKeyBorad{ get; set; }
         private static ReplyKeyboardMarkup? GetMenuKeyBoards{ get; set; }
-        private static ReplyKeyboardMarkup? AcceptCancelKeyBoard{ get; set; }
+        private static InlineKeyboardMarkup? AcceptCancelKeyBoard{ get; set; }
         private static ReplyKeyboardMarkup? MenuCancelKeyBoard{ get; set; }
         private static ReplyKeyboardMarkup? AdminLawKeyBoard{ get; set; }
 
@@ -50,7 +50,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
 
                    new []
                 {
-                        InlineKeyboardButton.WithCallbackData(text: "منو اصلی", callbackData: BotNameHelper.Menu),
+                        InlineKeyboardButton.WithCallbackData(text: "منو اصلی", callbackData: BotNameHelper.BackToMenu),
 
                 },
 
@@ -75,7 +75,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
    
                    new []
                 {
-                        InlineKeyboardButton.WithCallbackData(text: "منو اصلی", callbackData: BotNameHelper.Menu),
+                        InlineKeyboardButton.WithCallbackData(text: "منو اصلی", callbackData: BotNameHelper.SeeMenu),
                      
                 },
        
@@ -125,23 +125,35 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
             {
                 GetMenuKeyBoards = new(new[]
                     {
-                        new KeyboardButton[]{ "برگشت به منو"},
+                        new KeyboardButton[]{ BotNameHelper.SeeMenu},
                     })
                 { ResizeKeyboard = true };
             }
 
             return GetMenuKeyBoards;
         }
-        public static ReplyKeyboardMarkup GetAcceptCancelKeyBoardBoard()
+        public static InlineKeyboardMarkup GetAcceptCancelKeyBoardBoard()
         {
             if (AcceptCancelKeyBoard is null)
             {
                 AcceptCancelKeyBoard = new(new[]
-                    {
-                        new KeyboardButton[]{ BotNameHelper.CancelAction,BotNameHelper.AcceptSendMessage},
-                    })
-                { ResizeKeyboard = true };
+             {
+
+                   new []
+                 {
+                        InlineKeyboardButton.WithCallbackData(text: "تایید", callbackData: BotNameHelper.AcceptAction),
+                        InlineKeyboardButton.WithCallbackData(text: "کنسل", callbackData: BotNameHelper.CancelAction),
+                },
+
+                   new []
+                {
+                        InlineKeyboardButton.WithCallbackData(text: "منو اصلی", callbackData: BotNameHelper.BackToMenu),
+
+                },
+
+                });
             }
+        
 
             return AcceptCancelKeyBoard;
         }
@@ -152,6 +164,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
                 MenuCancelKeyBoard = new(new[]
                     {
                         new KeyboardButton[]{ BotNameHelper.CancelAction,BotNameHelper.SeeMenu},
+                        new KeyboardButton[]{ BotNameHelper.BackToMenu},
                     })
                 { ResizeKeyboard = true };
             }
@@ -165,6 +178,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
                 AdminLawKeyBoard = new(new[]
                     {
                         new KeyboardButton[]{ BotNameHelper.AdminPanel_SetLaws,BotNameHelper.AdminPanel_AddNewLaw},
+                        new KeyboardButton[]{ BotNameHelper.BackToMenu},
                     })
                 { ResizeKeyboard = true };
             }
@@ -178,7 +192,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
             {
                 BuyProductMenuKeyBoards = new(new[]
                     {
-                        new KeyboardButton[]{ BotNameHelper.BuyVoicher,BotNameHelper.Menu},
+                        new KeyboardButton[]{ BotNameHelper.BuyVoicher,BotNameHelper.BackToMenu},
                     })
                 { ResizeKeyboard = true };
             }
@@ -212,7 +226,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
                 CardsMenuKeyBoards = new ReplyKeyboardMarkup(new[]
                 {
                  new KeyboardButton[]{BotNameHelper.RegisteredCards ,BotNameHelper.AddNewCard},
-                 new KeyboardButton[]{BotNameHelper.Menu },
+                 new KeyboardButton[]{BotNameHelper.BackToMenu },
                
                 })
                 { InputFieldPlaceholder = "منو کارت ها", IsPersistent = true, ResizeKeyboard = true };
@@ -313,37 +327,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
 
         }
 
-        public static ReplyKeyboardMarkup ActivUser()
-        {
-            if (ActiveKeyboardMarkup is null)
-            {
-                ActiveKeyboardMarkup = new ReplyKeyboardMarkup(new[]
-                    {
-                        new KeyboardButton[] { "فعال کردن کاربر ✔️" },
-                        new KeyboardButton[] { "ارسال پیام به کاربر 📧", "لیست سفارشات کاربر 📄" },
-                        new KeyboardButton[] { "مدیریت " + "👨🏼‍💼", "صفحه اصلی" }
-
-                    })
-                { ResizeKeyboard = true };
-            }
-            return ActiveKeyboardMarkup;
-        }
-
-        public static ReplyKeyboardMarkup BlockUser()
-        {
-            if (BlockKeyboardMarkup == null)
-            {
-                BlockKeyboardMarkup = new ReplyKeyboardMarkup(new[]
-                     {
-                        new KeyboardButton[] { "مسدود کردن کاربر 🚧" },
-                        new KeyboardButton[] { "ارسال پیام به کاربر 📧", "لیست سفارشات کاربر 📄" },
-                        new KeyboardButton[] { "مدیریت "+ "👨🏼‍💼", "صفحه اصلی" }
-                    })
-                { ResizeKeyboard = true };
-            }
-
-            return BlockKeyboardMarkup;
-        }
+ 
         public static ReplyKeyboardMarkup SetAdminActiveSellingMainKeyboard()
         {
             if (AdminActiveSellingMainMarkup is null)

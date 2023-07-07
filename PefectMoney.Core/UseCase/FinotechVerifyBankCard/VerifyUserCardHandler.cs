@@ -51,12 +51,12 @@ namespace PefectMoney.Core.UseCase.VerifyCard
 
                 var result = await RestClient.PostAsync<VerifyUserCardResponseDto>(restRequest, cancellationToken);
 
-                if (result.Result.IsValid)
+                if (result?.Result?.IsValid == true)
                 {
                     return ResultOperation.ToSuccessResult();
                 }
 
-                if (result.Status == "FAILED")
+                if (result?.Status == "FAILED")
                 {
                     // if Token Unvalid Generate Token
                     if (result.Error.Code == "UNAUTHORIZED")
@@ -66,7 +66,7 @@ namespace PefectMoney.Core.UseCase.VerifyCard
                     }
                 }
 
-                var matchToVerifyUserCardResponseErrorCode = VerifyUserCardResponseErrorCode.VerifyMatchToError(result.ResponseCode);
+                var matchToVerifyUserCardResponseErrorCode = VerifyUserCardResponseErrorCode.VerifyMatchToError(result?.ResponseCode);
                 if (matchToVerifyUserCardResponseErrorCode != null)
                 {
                     if (matchToVerifyUserCardResponseErrorCode.Status == TypeErrorCodeStatus.UserError)
@@ -106,7 +106,7 @@ namespace PefectMoney.Core.UseCase.VerifyCard
             {
                 mobile = phoneNumber,
                 cart = cartNumber,
-                token = Botsettings.Token,
+                token = Botsettings.TokenExternalApp,
                 trackId,
             });
 
