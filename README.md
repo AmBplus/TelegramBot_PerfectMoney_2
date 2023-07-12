@@ -1,5 +1,5 @@
 # TelegramBot_PerfectMoney
-# ExternalServiceHandler ---[Microservice External Handler](https://link-url-here.org](https://github.com/AmBplus/ExternalServiceHandler))
+# ExternalServiceHandler ---[Microservice External Handler](https://github.com/AmBplus/ExternalServiceHandler)
 
 ربات صرافی آنلاین پرفکت مانی در تلگرام 
 
@@ -27,7 +27,7 @@
 لینک پروژه میکروسرویس 
 
 
-[Microservice External Handler](https://link-url-here.org](https://github.com/AmBplus/ExternalServiceHandler))
+[Microservice External Handler](https://github.com/AmBplus/ExternalServiceHandler)
 
 
 
