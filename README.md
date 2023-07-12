@@ -1,5 +1,5 @@
 # TelegramBot_PerfectMoney
-# ExternalServiceHandler
+# ExternalServiceHandler ---[Microservice External Handler](https://link-url-here.org](https://github.com/AmBplus/ExternalServiceHandler))
 
 ربات صرافی آنلاین پرفکت مانی در تلگرام 
 
@@ -8,6 +8,7 @@
 - [x] Telegram Bot
 - [x] Mysql
 - [x] CQRS
+- [x] Rest 
 - [x] MediatR
 - [x] Publish Message
 - [x] Connect To External Api
