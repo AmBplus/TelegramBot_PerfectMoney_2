@@ -39,8 +39,13 @@
 
 
 
+برخی از عکس های برنامه
 
 
+<img width="707" alt="ADMIN Menu" src="https://github.com/AmBplus/TelegramBot_PerfectMoney_2/assets/96792239/12c1957e-cd59-47da-837a-cd851b698f51">
 
 
+<img width="707" alt="listUser" src="https://github.com/AmBplus/TelegramBot_PerfectMoney_2/assets/96792239/986ebced-0b69-48ad-bc82-1866f99e90b8">
+
+<img width="708" alt="panel" src="https://github.com/AmBplus/TelegramBot_PerfectMoney_2/assets/96792239/94106a54-a921-4172-b57b-9e84b2d4e264">
 
