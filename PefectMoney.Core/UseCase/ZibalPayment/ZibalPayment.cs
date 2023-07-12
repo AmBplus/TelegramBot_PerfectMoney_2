@@ -107,7 +107,7 @@ public class ZiBalPaymentHandler : IRequestHandler<ZibalPaymentRequest, ResultOp
             RestRequest.AddBody(getLinkPaymentRequest);
             
 
-            var httpResponse = await RestClient.PostAsync<ResultOperation<ZiBalPaymentResponse>>(RestRequest);  // get Response
+            var httpResponse = await RestClient.PostAsync<ResultHandler<ZiBalPaymentResponse>>(RestRequest);  // get Response
                 if(!httpResponse.IsSuccess)
             {
                 return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult("عدم دریافت لینک پرداخت");
@@ -144,13 +144,14 @@ public class ZiBalPaymentHandler : IRequestHandler<ZibalPaymentRequest, ResultOp
         }
         catch (WebException ex)
         {
-            Logger.LogError(ex.Message, ex.InnerException?.Message); // print exception error
+            Logger.LogError(ex.Message,ex.InnerException?.Message,ex.StackTrace,ex.InnerException?.StackTrace); // print exception error
             await Mediator.Publish(new NotifyAdminRequest($"{ex.Message}---{ex.InnerException?.Message}"));
             return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult(ex.Message);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex.Message,ex.InnerException?.Message); // print exception error
+            Logger.LogError(ex.Message,ex.InnerException?.Message,ex.StackTrace,ex.InnerException?.StackTrace);
+            // print exception error
             await Mediator.Publish(new NotifyAdminRequest($"{ex.Message}---{ex.InnerException?.Message}"));
             return ResultOperation<ZiBalPaymentHandlerResponse>.ToFailedResult(ex.Message);
         }

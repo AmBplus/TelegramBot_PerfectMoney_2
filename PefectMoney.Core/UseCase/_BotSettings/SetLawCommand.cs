@@ -16,18 +16,24 @@ namespace PefectMoney.Core.UseCase._BotSettings
     }
     public class SetLawCommandHandler : IRequestHandler<SetLawCommandRequest, ResultOperation>
     {
-        public SetLawCommandHandler(IWritableOptions<BotSettings> writableOptions , ILogger<SetLawCommandHandler> logger )
+        public SetLawCommandHandler(IWritableOptions<BotSettings> writableOptions,
+            IMediator mediator 
+            , ILogger<SetLawCommandHandler> logger )
         {
             WritableOptions = writableOptions;
+            Mediator = mediator;
             Logger = logger;
         }
 
         public IWritableOptions<BotSettings> WritableOptions { get; }
+        public IMediator Mediator { get; }
         public ILogger<SetLawCommandHandler> Logger { get; }
 
         public async Task<ResultOperation> Handle(SetLawCommandRequest request, CancellationToken cancellationToken)
         {
             WritableOptions.Update(x => x.RuleText = new List<string>() { request.Law });
+           
+            
             return ResultOperation.ToSuccessResult();            
            
         }

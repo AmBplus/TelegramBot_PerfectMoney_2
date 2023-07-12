@@ -6,7 +6,7 @@ namespace PefectMoney.Core.Model
 {
     public class UserEntity: Base<long>
     {
-        public UserEntity(long botChatId,string phoneNumber,int roleId)
+        public UserEntity(long botChatId,string phoneNumber,int roleId) :base()
         {
             BotChatId = botChatId;
             PhoneNumber = phoneNumber;
@@ -14,7 +14,7 @@ namespace PefectMoney.Core.Model
             CreationDate = TimeHelper.DateTimeNow;
             Active = true;
         }
-        public UserEntity(string phoneNumber, int roleId)
+        public UserEntity(string phoneNumber, int roleId) : base()
         {
            
             PhoneNumber = phoneNumber;

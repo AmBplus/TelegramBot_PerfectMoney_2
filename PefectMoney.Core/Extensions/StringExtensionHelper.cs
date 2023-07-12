@@ -11,9 +11,13 @@ namespace PefectMoney.Core.Extensions
     {
         public static string ToStringEnumerable(this IEnumerable<string> enumTexts)
         {
-            var sb = new StringBuilder();   
-            foreach (var enumText in enumTexts) { 
-            sb.Append(enumText.ToString());}
+            var sb = new StringBuilder();
+            if (enumTexts != null)
+                foreach (var enumText in enumTexts)
+                {
+                    sb.Append(enumText);
+                }
+            else return null;
             return sb.ToString();
         }
         public static string CreateString(params string[] strings)

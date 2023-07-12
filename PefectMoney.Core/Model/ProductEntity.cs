@@ -9,7 +9,10 @@ namespace PefectMoney.Core.Model
 {
     public class ProductEntity : Base<long>
     {
+        public ProductEntity() : base()
+        {
 
+        }
         public string Name { get; set; }
         
         public ICollection<OrderEntity> Orders { get; set; }

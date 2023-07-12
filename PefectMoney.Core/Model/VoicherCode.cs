@@ -11,9 +11,8 @@ namespace PefectMoney.Core.Model
 {
     public class VoicherCodeEntity : Base<long>
     {
-        public VoicherCodeEntity()
+        public VoicherCodeEntity() :base()
         {
-            CreationDate = TimeHelper.DateTimeNow;
         }
         public string VoicherCode { get; set; }
         

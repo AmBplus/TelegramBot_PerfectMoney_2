@@ -10,6 +10,10 @@ namespace PefectMoney.Core.Model
     public class BankCardEntity
         : Base<long>
     {
+        public BankCardEntity() : base()
+        {
+
+        }
         public string CartNumber { get; set; }
         public bool IsActive { get; set; }
         public long UserId { get; set; } // Foreign key property

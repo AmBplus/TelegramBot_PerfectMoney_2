@@ -9,13 +9,13 @@ using MediatR;
 using PefectMoney.Core.UseCase.PerfectMoney;
 
 namespace PefectMoney.Presentation.Controllers;
-
+[Route("verifypayment")]
 public class VerifyPaymentController : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Post(
        
-        ResultOperation<ZibalVerifyPaymentRequest> request,IMediator mediator,
+        ResultHandler<ZibalVerifyPaymentRequest> request,IMediator mediator,
         CancellationToken cancellationToken)
     {
 
@@ -29,11 +29,6 @@ public class VerifyPaymentController : ControllerBase
             await mediator.Send(new PerfectMoneyVoicherPayRequest() { Order = result.Data });
             }
         }
-       
-
-
-
-      
         return Ok();
     }
 }

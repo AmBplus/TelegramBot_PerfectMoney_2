@@ -1,19 +1,28 @@
 {
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "https://dotnetcore-3x0lii.chbk.run;https://localhost:80",
-      "sslPort": 44315
-    }
-  },
   "profiles": {
     "Telegram.Bot": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://dotnetcore-3x0lii.chbk.run;https://localhost:80"
+      "applicationUrl": "https://c6d2-2a03-ef43-6-9c2d-c9fd-4714-886-d5ea.ngrok-free.app;https://localhost:443"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "launchUrl": "https://localhost:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://0f5a-2a03-ef43-6-9c2d-c9fd-4714-886-d5ea.ngrok-free.app;http://localhost:5432"
+      },
+      "distributionName": ""
+    }
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "https://0f5a-2a03-ef43-6-9c2d-c9fd-4714-886-d5ea.ngrok-free.app;https://localhost:80",
+      "sslPort": 44315
     }
   }
 }

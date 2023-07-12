@@ -8,6 +8,5 @@ namespace PefectMoney.Core.Model
 {
     public class OrderCodeVoicherEntity
     {
-
-    }
+            }
 }

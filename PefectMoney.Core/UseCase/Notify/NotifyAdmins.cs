@@ -18,21 +18,21 @@ namespace PefectMoney.Core.UseCase.Notify
     }
     public class NotifyAdminsHandler : INotificationHandler<NotifyAdminRequest>
     {
-        public NotifyAdminsHandler(ITelegramBotClient botClient , ITelContext context, ILogger<NotifyAdminsHandler> logger,IMediator mediator)
+        public NotifyAdminsHandler(ITelegramBotClient botClient , ITelContext context, ILogger<NotifyAdminsHandler> logger)
         {
             BotClient = botClient;
             Context = context;
             Logger = logger;
-            Mediator = mediator;
+         
         }
 
         public ITelegramBotClient BotClient { get; }
         public ITelContext Context { get; }
         public ILogger<NotifyAdminsHandler> Logger { get; }
-        public IMediator Mediator { get; }
 
         public async Task Handle(NotifyAdminRequest notification, CancellationToken cancellationToken)
         {
+            Logger.LogInformation("Log To Admin ");
             try
             {
                 var adminUsers = await Context.Users.Where(x => x.RoleId == RoleName.Admin).ToListAsync();
@@ -40,7 +40,11 @@ namespace PefectMoney.Core.UseCase.Notify
                 {
                     try
                     {
-                        await BotClient.SendTextMessageAsync(chatId: adminUser.BotChatId, text: $"نوتیفیکشن : {notification.Message}");
+                        if(adminUser.BotChatId !=null)
+                        {
+                            await BotClient.SendTextMessageAsync(chatId: adminUser.BotChatId, text: $"نوتیفیکشن : {notification.Message}");
+                        }
+                        Logger.LogInformation("----- Admin Don't Have BotChatID -----");
                     }
                     catch (Exception e)
                     {

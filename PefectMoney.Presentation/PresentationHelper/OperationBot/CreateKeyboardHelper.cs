@@ -125,7 +125,7 @@ namespace PefectMoney.Presentation.PresentationHelper.OperationBot
             {
                 GetMenuKeyBoards = new(new[]
                     {
-                        new KeyboardButton[]{ BotNameHelper.SeeMenu},
+                        new KeyboardButton[]{ BotNameHelper.BackToMenu},
                     })
                 { ResizeKeyboard = true };
             }

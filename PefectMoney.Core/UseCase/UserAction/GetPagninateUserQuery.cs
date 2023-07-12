@@ -109,7 +109,7 @@ namespace PefectMoney.Core.UseCase.UserAction
             }
             catch (Exception e)
             {
-                Logger.LogError(e.Message, e);
+                Logger.LogError(e.Message, e , e.StackTrace,e.InnerException?.StackTrace,e.InnerException?.Message);
                 await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation<PaginateGetUserQueryResponse>.ToFailedResult("تعداد کاربران نمیتواند نال بشود");
             }

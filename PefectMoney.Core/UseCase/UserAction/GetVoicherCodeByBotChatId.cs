@@ -55,8 +55,9 @@ namespace PefectMoney.Core.UseCase.UserAction
             }
             catch (Exception e)
             {
-                Logger.LogError(e.Message, e.InnerException?.Message);
-                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}--{e.InnerException?.Message}"));
+                
+                Logger.LogError(e.Message, e.InnerException?.Message, e.StackTrace , e.InnerException?.StackTrace);
+                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}--{e.InnerException?.Message}{e.StackTrace}--{e.InnerException?.StackTrace}"));
                 return ResultOperation<List<VoicherCodeDto>>.ToFailedResult("مشکلی پیش آمده ، در اسرع وقت به مشکل رسیدگی خواهد شد ، شکیبا باشید.");
             }
 

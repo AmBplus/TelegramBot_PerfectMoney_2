@@ -14,10 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.BootstrapInjectServices(builder.Configuration);
 var botConfigurationSection = builder.Configuration.GetSection(BotConfiguration.Configuration);
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(80);//http
-});
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    options.ListenAnyIP(80);//http
+//});
 builder.Services.Configure<BotConfiguration>(botConfigurationSection);
 if(builder.Environment.EnvironmentName == Environments.Development)
 {  

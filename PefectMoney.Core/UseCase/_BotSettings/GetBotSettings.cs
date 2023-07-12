@@ -14,7 +14,7 @@ namespace PefectMoney.Core.UseCase._BotSettings
     }
     public class GetBotSettingsHandler : IRequestHandler<GetBotSettingsRequest, BotSettings>
     {
-        public GetBotSettingsHandler(IOptions<BotSettings> options)
+        public GetBotSettingsHandler(IOptionsSnapshot<BotSettings> options)
         {
             BotSettings = options.Value;
         }

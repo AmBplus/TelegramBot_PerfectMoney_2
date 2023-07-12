@@ -33,7 +33,7 @@ namespace PefectMoney.Core.UseCase.VerifyCard
             Botsettings = botsettings.Value;
             Mediator = mediator;
             Logger = logger;
-            RestClient = new RestClient(botsettings.Value.ExternalAppBaseUrl);
+           
 
         }
         RestClient RestClient { get; set; }
@@ -46,27 +46,27 @@ namespace PefectMoney.Core.UseCase.VerifyCard
         {
             try
             {
-               
+                RestClient = new RestClient(Botsettings.ExternalAppBaseUrl);
                 RestRequest restRequest = GenerateVerifyRestRequest(request.phoneNumber, request.cartNumber, request.trackId);
 
-                var result = await RestClient.PostAsync<VerifyUserCardResponseDto>(restRequest, cancellationToken);
+                var result = await RestClient.PostAsync<ResultHandler<VerifyUserCardResponseDto>>(restRequest, cancellationToken);
 
-                if (result?.Result?.IsValid == true)
+                if (result?.Data?.Result?.IsValid == true)
                 {
                     return ResultOperation.ToSuccessResult();
                 }
 
-                if (result?.Status == "FAILED")
+                if (result?.Data?.Status == "FAILED")
                 {
                     // if Token Unvalid Generate Token
-                    if (result.Error.Code == "UNAUTHORIZED")
+                    if (result.Data.Error.Code == "UNAUTHORIZED")
                     {
 
                         return ResultOperation.ToFailedResult("خطای سیستمی بعدا امتحان نمایید");
                     }
                 }
 
-                var matchToVerifyUserCardResponseErrorCode = VerifyUserCardResponseErrorCode.VerifyMatchToError(result?.ResponseCode);
+                var matchToVerifyUserCardResponseErrorCode = VerifyUserCardResponseErrorCode.VerifyMatchToError(result?.Data?.ResponseCode);
                 if (matchToVerifyUserCardResponseErrorCode != null)
                 {
                     if (matchToVerifyUserCardResponseErrorCode.Status == TypeErrorCodeStatus.UserError)
@@ -86,8 +86,8 @@ namespace PefectMoney.Core.UseCase.VerifyCard
                     await Mediator.Publish(new NotifyAdminRequest($"{matchToVerifyUserCardResponseErrorCode.Name}"));
                     return ResultOperation.ToFailedResult("مشکل سیستمی به وجود آمده به ادمین اطلاع دهید");
                 }
-                Logger.LogError($"{result.Error}--{result.Status}{result.ResponseCode}");
-                await Mediator.Publish(new NotifyAdminRequest($"{result.Error}--{result.Status}{result.ResponseCode}"));
+                Logger.LogError($"{result?.Data?.Error}--{result?.Data.Status}{result?.Data?.ResponseCode}");
+                await Mediator.Publish(new NotifyAdminRequest($"{result?.Data?.Error} -- {result?.Data?.Status} {result?.Data?.ResponseCode}"));
                 return ResultOperation.ToFailedResult("خطای سیستمی به وجود آمده به ادمین اطلاع دهید");
             }
             catch (Exception e)

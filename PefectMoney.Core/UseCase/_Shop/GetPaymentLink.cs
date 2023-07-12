@@ -51,6 +51,7 @@ namespace PefectMoney.Core.UseCase._Shop
             
             var dollarTotalAmount = Convert.ToDouble(request.Count) * result.Data.Dollars;
             var rialsTotalAmount = request.Count * result.Data.Rials;
+            var trackId = Guid.NewGuid().ToString();
             OrderEntity order = new OrderEntity() { 
                 BotChatId = request.BotChatId,
                 Count = request.Count,
@@ -59,7 +60,8 @@ namespace PefectMoney.Core.UseCase._Shop
                 TotalDollarPrice = dollarTotalAmount,
                 TotalRialsPrice = rialsTotalAmount,
                 Dollar = result.Data.Dollars,
-                Rial = result.Data.Rials
+                Rial = result.Data.Rials,
+                trackId = trackId
             };
             try
             {
@@ -68,7 +70,8 @@ namespace PefectMoney.Core.UseCase._Shop
             }
             catch (Exception e)
             {
-                Logger.LogError(e.Message, e.InnerException?.Message);
+                
+                
                 await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation<Uri>.ToFailedResult("خطایی پیش آمده بعدا امتحان کنید");
 
@@ -92,7 +95,7 @@ namespace PefectMoney.Core.UseCase._Shop
             }
             catch (Exception e)
             {
-                Logger.LogError(e.Message, e.InnerException?.Message);
+                Logger.LogError(e.Message, e.InnerException?.Message, e.StackTrace , e.InnerException?.StackTrace);
                 await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation<Uri>.ToFailedResult( "مشکلی پیش آمده بعدا تلاش کنید");
             }

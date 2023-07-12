@@ -42,7 +42,7 @@ namespace PefectMoney.Core.UseCase.Notify
             }
             catch (Exception e)
             {
-                await Mediator.Publish(new NotifyAdminRequest($"{e.Message}--{e.InnerException?.Message}"));
+                Logger.LogError(e.Message, e.InnerException?.Message, e.StackTrace , e.InnerException?.StackTrace);
             }
         }
     }

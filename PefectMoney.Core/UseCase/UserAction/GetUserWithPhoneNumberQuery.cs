@@ -66,7 +66,8 @@ namespace PefectMoney.Core.UseCase.UserAction
             }
             catch (Exception e)
             {
-                Logger.LogError(e.Message, e.InnerException?.Message);
+                Logger.LogError(e.Message, e.InnerException?.Message, e.StackTrace , e.InnerException?.StackTrace);
+                
                 await Mediator.Publish(new NotifyAdminRequest($"{e.Message}---{e.InnerException?.Message}"));
                 return ResultOperation<UserDto>.ToFailedResult();
             }

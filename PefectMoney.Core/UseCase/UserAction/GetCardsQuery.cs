@@ -33,9 +33,12 @@ namespace PefectMoney.Core.UseCase.UserAction
         {
             try
             {
-                var result = Context.Users.Where(x => x.BotChatId == request.ChatId).Include(x => x.BankAccountNumbers).Select(x => new GetUserCardsResponse(x.BotChatId)
+              
+                var result = Context.Users.Where(x => x.BotChatId == request.ChatId)
+                    .Include(x => x.BankAccountNumbers)
+                    .Select(x => new GetUserCardsResponse(x.BotChatId)
                 {
-                    UserCards = x.BankAccountNumbers.Where(b => b.IsActive)
+                    UserCards = x.BankAccountNumbers
                    .Select(b =>
                      new UserCardsDto(b.CartNumber) { }).ToList(),
 

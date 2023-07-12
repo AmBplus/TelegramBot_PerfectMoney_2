@@ -26,6 +26,7 @@ namespace PefectMoney.Shared.Utility
                      .Select(f => f.GetValue(null))
                      .Cast<T>();
 
+
         public override bool Equals(object obj)
         {
             if (obj is not Enumeration<IdType, NameType> otherValue)

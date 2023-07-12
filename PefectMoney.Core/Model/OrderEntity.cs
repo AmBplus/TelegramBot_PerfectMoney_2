@@ -10,9 +10,8 @@ namespace PefectMoney.Core.Model
 {
     public class OrderEntity
     {
-        public OrderEntity()
+        public OrderEntity() :base()
         {
-            CreationTime = TimeHelper.DateTimeNow;
         }
         public DateTime CreationTime { get; set; }
         public long Id { get; set; }

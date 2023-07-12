@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "PefectMoney.Infrastructure": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:10975;http://localhost:10977"
+    }
+  }
+}
