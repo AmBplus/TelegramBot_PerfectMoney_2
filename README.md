@@ -1,5 +1,6 @@
-# TelegramBot_PerfectMoney_2
-# KalaMarket
+# TelegramBot_PerfectMoney
+# ExternalServiceHandler
+
 ربات صرافی آنلاین پرفکت مانی در تلگرام 
 
 موارد کلیدی پروژه
@@ -18,12 +19,16 @@
 - [x] Web Hook
 - [x] EF Core
 - [x] Microservice Concept
-- [x] DDD Concept
 - [x] Modular Design
 
 
 این پروژه خود شامل دو پروژه هست ، که یکی به صورت مونولوتیک و دیگری به صورت میکروسرویس پیاده سازی شده که دو سولوشن متفاوت قرار گرفته اند
 لینک پروژه میکروسرویس 
+
+
+[Microservice External Handler](https://link-url-here.org](https://github.com/AmBplus/ExternalServiceHandler))
+
+
 
 
 این برنامه یک برنامه تجاری بوده که با گرفتن تلفن از شخص کار خودش را شروع میکند ، به صورتی که در بات تلگرام از شما درخواست میشود با برنامه شماره خود راه به اشتراک بگذارید سپس شما به قابلیت برنامه دسترسی داشت 
