@@ -4,9 +4,14 @@
 
 موارد کلیدی پروژه
 - [x] Asp.net Core
-- [x] Clean Architecture
+- [x] Telegram Bot
 - [x] Mysql
-- [ ] Mysql1
+- [x] Connect To External Api
+- [x] Result Pattern
+- [x] Clean Architecture
+- [x] Perfect Monney
+- [x] Zibal
+- [x] Finotech
 - [x] Web Hook
 - [x] EF Core
 - [x] Microservice Concept
