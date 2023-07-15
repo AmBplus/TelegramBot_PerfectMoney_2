@@ -21,7 +21,7 @@
 - [x] EF Core
 - [x] Microservice Concept
 - [x] Modular Design
-- [x] appState Pattern
+- [x] AppState Pattern
 
 این پروژه خود شامل دو پروژه هست ، که یکی به صورت مونولوتیک و دیگری به صورت میکروسرویس پیاده سازی شده که دو سولوشن متفاوت قرار گرفته اند
 لینک پروژه میکروسرویس 
