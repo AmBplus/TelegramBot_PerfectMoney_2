@@ -18,7 +18,7 @@ namespace TelegramBot_PerfectMoney.Model
         public string? ChatId { get; set; }
         public bool Active { get; set; }
         public long RoleId { get; set; }
-        public ICollection<BankCart> BankAccountNumbers { get; set; }
+        public ICollection<BankAccountNumber> BankAccountNumbers { get; set; }
         public RoleModel? Roles { get; set; }
         public UserModel()
         {

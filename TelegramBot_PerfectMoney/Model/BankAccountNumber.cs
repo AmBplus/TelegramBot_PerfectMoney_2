@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace TelegramBot_PerfectMoney.Model
 {
-    public class BankCart : Base
+    public class BankAccountNumber : Base
     {
-        public string CartNumber { get; set; }
-        public bool IsActive { get; set; }
+        public string ShabaNumber { get; set; }
         public long UserId { get; set; } // Foreign key property
 
         public UserModel User { get; set; } // Navigation property

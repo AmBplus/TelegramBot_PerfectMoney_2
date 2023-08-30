@@ -9,9 +9,9 @@ using TelegramBot_PerfectMoney.Model;
 
 namespace TelegramBot_PerfectMoney.DataBase
 {
-    class BankAccountNumberMapping : IEntityTypeConfiguration<BankCart>
+    class BankAccountNumberMapping : IEntityTypeConfiguration<BankAccountNumber>
     {
-        public void Configure(EntityTypeBuilder<BankCart> builder)
+        public void Configure(EntityTypeBuilder<BankAccountNumber> builder)
         {
             builder.HasOne(b => b.User)
                 .WithMany(u => u.BankAccountNumbers)
